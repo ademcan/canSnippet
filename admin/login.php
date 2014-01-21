@@ -29,14 +29,14 @@ session_start();
 <html>
 
 <?php
-
 // Checking all login information 
 if($_SERVER['REQUEST_METHOD'] == 'POST') {
     // Create users table
     $mytable ="user";
 
-    if(!class_exists('SQLite3'))
-      die("SQLite 3 NOT supported.");
+    if (!extension_loaded($parameters["db"]["driver"])) {
+        die('PDO unavailable');
+    }
 
     $base = Factory::database($parameters);
 
