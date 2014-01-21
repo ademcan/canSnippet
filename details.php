@@ -11,7 +11,7 @@
     include 'includes/menu.php';
 
     $mytable ="snippets";
-    $base=new SQLite3($config["dbname"]);
+    $base = Factory::database($config);
     
     $query_name = "SELECT * FROM $mytable WHERE ID=".intval($_GET["id"])." ";
     $results_name = $base->query($query_name);

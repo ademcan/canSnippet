@@ -47,8 +47,6 @@ if (file_exists($config["dbname"])) {
 
             $base = Factory::database($config);
 
-            /*$base = new SQLite3($config["dbname"]);*/
-
             $query = "CREATE TABLE user(
                     username VARCHAR(30) NOT NULL UNIQUE,
                     password VARCHAR(64) NOT NULL,

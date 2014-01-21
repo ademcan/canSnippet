@@ -8,7 +8,7 @@ include "autoload.php";
 
     session_start();
     $mytable ="snippets";
-    $base=new SQLite3($dbname);
+    $base = Factory::database($config);
 
     if(isset($_POST["action"]) && $_POST['action']=="getcode"){
         $id = $_POST["id"];
@@ -77,7 +77,7 @@ include "autoload.php";
     if( isset($_POST["search"]) ){
         include 'includes/menu.php';
         $mytable ="snippets";
-        $base=new SQLite3($config["dbname"]);
+        $base = Factory::database($config);
         $search = SQLite3::escapeString($_POST['search']);
         
         if(isset($_SESSION['valid']) && $_SESSION['valid']){

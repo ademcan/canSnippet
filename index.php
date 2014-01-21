@@ -15,7 +15,7 @@
     include 'includes/menu.php';
 
     $mytable ="snippets";
-    $base=new SQLite3($config["dbname"]);
+    $base = Factory::database($config);
     
     $count_query = "SELECT count(*) as count FROM $mytable";
     $results_count = $base->query($count_query);

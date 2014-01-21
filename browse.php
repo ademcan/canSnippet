@@ -5,10 +5,10 @@
   @description: browse page allow users to choose a language and a corresponding snippet
  */
     session_start();
-include "autoload.php";
+    include "autoload.php";
     include 'includes/menu.php';
     $mytable ="snippets";
-    $base=new SQLite3($config["dbname"]);
+    $base = Factory::database($config);
 ?>
 
 <h1>Browse snippets</h1>
