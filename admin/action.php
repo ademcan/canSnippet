@@ -17,7 +17,8 @@ setlocale(LC_CTYPE, 'fr_FR.UTF-8');
 
 $search  = array('&'    , '"'     , "'"    , '<'   , '>'    );
 $replace = array('&amp;', '&quot;', '&#39;', '&lt;', '&gt;' );
-
+if(!isset($_GET["action"]))
+	$_GET["action"] = "";
 // Delete a snippet based on its identifier
 if (($_GET["action"] == "delete")) {
     // connection to the database
@@ -42,7 +43,6 @@ if (($_GET["action"] == "edit")) {
     include 'admin-menu.php';
     echo'<h1>Edit snippet</h1><div id="newSnippet">';
     while ($row = $results_name->fetchArray()) {
-        echo $row['language'] . "<br>";
         echo'
         <form method="post">
         <table>
@@ -87,15 +87,15 @@ if (($_GET["action"] == "edit")) {
             
                 </select>
                 </td></tr>
-                <tr><td>Code</td><td><textarea name="description" style="width:500px;height:100px;">';
+                <tr><td>Description</td><td><textarea name="description" style="width:500px;height:100px;">';
         echo $row['description'];
         echo '</textarea></td></tr>
         
             <tr><td>Code</td><td><textarea name="code" style="width:500px;height:300px;">';
         echo $row['code'];
         echo '</textarea></td></tr>
-            <tr><td>Private</td><td><input type="checkbox" name="private" ';
-        if ($row['private'] == "1") {
+            <tr><td>Private</td><td><input type="checkbox" name="private" value="on" ';
+        if ($row['private'] == "on") {
             echo "checked";
         } echo'></td></tr>
             </table>
@@ -105,17 +105,16 @@ if (($_GET["action"] == "edit")) {
     }
     // Saving edited information to the database
     if ($_SERVER['REQUEST_METHOD'] == 'POST') {
-        $name = iconv('UTF-8', 'ISO-8859-15', $_POST['name']);
+		$name = $_POST['name'];
         $language = $_POST['language'];
-        $code = iconv('UTF-8', 'ISO-8859-15', $_POST['code']);
-        
+		$code = $_POST['code'];
         $name = str_replace($search, $replace, $name);
         $description = str_replace($search, $replace, $_POST['description']);
         $code = str_replace($search, $replace, $code);
         
-        $private = $_POST['private'];
+        $private = (isset($_POST['private']) && $_POST['private'] === "on")?"on":"off";
         $id = $_GET['id']; 
-        $query_update = "UPDATE $mytable set name='$name', code='$code', language='$language', description='$description' where ID='$id' ";
+        $query_update = "UPDATE $mytable set name='$name', code='$code', language='$language', description='$description', private='$private' where ID='$id' ";
         $results = $base->exec($query_update);
         header("location:index.php");
     }
@@ -132,15 +131,14 @@ if (isset($_POST["add"])) {
     $description = str_replace($search, $replace, $description);
 
     $code = $_POST['code'];
-    $private = $_POST['private'];
+    $private = (isset($_POST['private']) && $_POST['private'] = "on")?"on":"off";
     $date = date("F j, Y - H:i");
     // connect to the database
     $dbname = '../snippets.sqlite';
     $mytable = "snippets";
     $base = new SQLite3($dbname);
 
-    $code = iconv('UTF-8', 'ISO-8859-15', $_POST['code']);
-    $code = htmlspecialchars($code, ENT_QUOTES);
+    $code = iconv('UTF-8', 'ISO-8859-15', htmlspecialchars($_POST['code'], ENT_QUOTES));
     
     $query = "INSERT INTO $mytable(language, name, description, code, private, date)
                     VALUES ( '$language', '$name', '$description', '$code', '$private', '$date')";
@@ -180,7 +178,7 @@ if (($_GET["action"] == "add")) {
                     </td></tr>
                 <tr><td>Description</td><td><textarea name="description" style="width:500px;height:100px;"></textarea></td></tr>
                 <tr><td>Code</td><td><textarea name="code" style="width:500px;height:300px;"></textarea></td></tr>
-                <tr><td>Private</td><td><input type="checkbox" name="private"></td></tr>
+                <tr><td>Private</td><td><input type="checkbox" name="private" value="on"></td></tr>
             </table>
             <input name="add" type="hidden" />
             <input class="loginButton" type="submit" value="Add snippet" class="submit"/>
