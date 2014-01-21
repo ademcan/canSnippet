@@ -20,9 +20,10 @@ class Factory {
 		}
 
 		if (!$db->exist()) {
-			$db->create();
+			//redirect
+			//header('Location: '."/install.php", true, 302);
 		}
 
-		return $db->open();
+		return $db;
 	}
 }

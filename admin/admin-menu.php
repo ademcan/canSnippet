@@ -15,8 +15,7 @@ if (!isset($_SESSION))
         <?php
         $base = Factory::database($parameters);
         $queryT = "SELECT * FROM settings ";
-        $resultsT = $base->query($queryT);
-        $rowT = $resultsT->fetchArray();
+        $rowT = $base->execute($queryT)->fetchArray();
         $themeT = $rowT['theme'];
         echo '<link rel="stylesheet" href="../css/flat.css" type="text/css" media="screen" />';
         ?>

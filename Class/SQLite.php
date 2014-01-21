@@ -3,10 +3,14 @@
 class SQLite implements IDatabase {
 	protected $kernelDir;
 	protected $path;
+	protected $db;
+	protected $lastRequest;
 
 	public function __construct($kernelDir, $path) {
 		$this->kernelDir = $kernelDir;
 		$this->path = $path;
+		$this->db = null;
+		$this->lastRequest = null;
 	}
 
 	public function getPath() {
@@ -15,14 +19,31 @@ class SQLite implements IDatabase {
 
 	//Implements IDatabase
 	public function create() {
-		throw new Exception("No implementation", 1);
+		$this->open();
+	}
+
+	public function execute($sql) {
+		$this->open();
+
+		$this->lastRequest = $this->db->query($sql);
+
+		return $this;
 	}
 
 	public function exist() {
-		return true; //Return already true because if database doesn't exist, the SQLite3 object create then.
+		if (file_exists($this->path)) {
+		    return true;
+		}
+		return false;
+	}
+
+	public function fetchArray() {
+		return $this->lastRequest->fetchArray();
 	}
 
 	public function open() {
-		return new SQLite3($this->kernelDir."/".$this->path);
+		if ($this->db == null) {
+			$this->db = new SQLite3($this->kernelDir."/".$this->path);
+		}
 	}
 }

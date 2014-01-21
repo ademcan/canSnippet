@@ -15,8 +15,7 @@ if (isset($_SESSION['valid']) && $_SESSION['valid']) {
     $base = Factory::database($parameters);
 
     $count_query = "SELECT count(*) as count FROM $mytable";
-    $results_count = $base->query($count_query);
-    $row_count = $results_count->fetchArray();
+    $row_count = $base->execute($count_query)->fetchArray();
     $snippets_count = $row_count['count'];
     $limit = 10;
     $page = 1;
@@ -27,7 +26,7 @@ if (isset($_SESSION['valid']) && $_SESSION['valid']) {
     $start_count = $limit * ($page - 1);
 
     $query_name = "SELECT * FROM $mytable ORDER BY date DESC LIMIT $start_count,$limit";
-    $results_name = $base->query($query_name);
+    $results_name = $base->execute($query_name);
 
     echo '<h1>My snippets</h1><div id="newSnippet">';
 

@@ -7,7 +7,9 @@
  */
 include "autoload.php";
 
-if (file_exists($parameters["dbname"])) {
+$base = Factory::database($parameters);
+
+if ($base->exist()) {
     echo "Installation process already done";
 } else {
 
@@ -53,7 +55,7 @@ if (file_exists($parameters["dbname"])) {
                     salt VARCHAR(3) NOT NULL,
                     PRIMARY KEY(username)
                 )";
-            $results = $base->exec($query);
+            $results = $base->execute($query);
 
             //retrieve our data from POST
             $username = $_POST['username'];
@@ -82,7 +84,7 @@ if (file_exists($parameters["dbname"])) {
             // Add the user to the database
             $addUser = "INSERT INTO user(username, password, salt)
                 VALUES ('$username' , '$hash' ,'$salt')";
-            $base->exec($addUser);
+            $base->execute($addUser);
 
             // Create snippets table
             $createSnippetsDatabase = "CREATE TABLE snippets(
@@ -94,7 +96,7 @@ if (file_exists($parameters["dbname"])) {
                 date date,
                 private integer
                 )";
-            $base->exec($createSnippetsDatabase);
+            $base->execute($createSnippetsDatabase);
 
             // Create settings table
             $createSettingsDatabase = "CREATE TABLE settings(
@@ -103,12 +105,12 @@ if (file_exists($parameters["dbname"])) {
                 title longtext,
                 theme longtext
                 )";
-            $base->exec($createSettingsDatabase);
+            $base->execute($createSettingsDatabase);
 
             // Add default settings to database  
             $addDefaultSettings = "INSERT INTO settings(username, title, theme)
                 VALUES ('$username' , '$title', 'flat')";
-            $base->exec($addDefaultSettings);
+            $base->execute($addDefaultSettings);
             
             ?>
             <script>

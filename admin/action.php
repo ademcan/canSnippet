@@ -21,7 +21,7 @@ if (($_GET["action"] == "delete")) {
     $base = Factory::database($parameters);
     // sql command to delete the snippet
     $query_name = "DELETE FROM $mytable WHERE ID=" . $_GET["id"] . "";
-    $results_name = $base->query($query_name);
+    $results_name = $base->execute($query_name);
     // returns to the main admin page
     header("location:index.php");
 }
@@ -31,7 +31,7 @@ if (($_GET["action"] == "edit")) {
     $mytable = "snippets";
     $base = Factory::database($parameters);
     $query_name = "SELECT * FROM $mytable WHERE ID=" . $_GET["id"] . " ";
-    $results_name = $base->query($query_name);
+    $results_name = $base->execute($query_name);
     // Edit page
     include 'admin-menu.php';
     echo'<h1>Edit snippet</h1><div id="newSnippet">';
@@ -110,7 +110,7 @@ if (($_GET["action"] == "edit")) {
         $private = $_POST['private'];
         $id = $_GET['id']; 
         $query_update = "UPDATE $mytable set name='$name', code='$code', language='$language', description='$description' where ID='$id' ";
-        $results = $base->exec($query_update);
+        $results = $base->execute($query_update);
         header("location:index.php");
     }
 }
@@ -137,7 +137,7 @@ if (isset($_POST["add"])) {
     
     $query = "INSERT INTO $mytable(language, name, description, code, private, date)
                     VALUES ( '$language', '$name', '$description', '$code', '$private', '$date')";
-    $results = $base->exec($query);
+    $results = $base->execute($query);
     // returns to the main admin page
     header("location:index.php");
 }
@@ -191,7 +191,7 @@ if (($_GET["action"] == "preferences")) {
 
     include 'admin-menu.php';
     $query_name = "SELECT * FROM settings ";
-    $results_name = $base->query($query_name);
+    $results_name = $base->execute($query_name);
     $row = $results_name->fetchArray();
     ?>
 
@@ -201,7 +201,7 @@ if (($_GET["action"] == "preferences")) {
     <?php
     // get user pasword information
     $query_pwd = "SELECT * FROM user ";
-    $results_pwd = $base->query($query_pwd);
+    $results_pwd = $base->execute($query_pwd);
     $row_pwd = $results_pwd->fetchArray()
     ?>
         <br>
@@ -227,7 +227,7 @@ if (($_GET["action"] == "preferences")) {
         if (isset($_POST['theme'])) {
             $theme = $_POST['theme'];
             $queryUpdateSettings = "UPDATE settings set theme= '$theme' ";
-            $base->exec($queryUpdateSettings);
+            $base->execute($queryUpdateSettings);
             echo "<script>location.href='action.php?action=preferences';</script>";
         }
 
@@ -244,7 +244,7 @@ if (($_GET["action"] == "preferences")) {
             $salt = createSalt();
             $hash = hash('sha256', $salt . $hash);
             $queryUpdatePwd = "UPDATE user SET password='$hash', salt='$salt' ";
-            $base->exec($queryUpdatePwd);
+            $base->execute($queryUpdatePwd);
             echo "<script>alert('Password successfuly changed!'); location.href='action.php?action=preferences';</script>";
         } else {
             ?>

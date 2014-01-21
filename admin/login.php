@@ -47,7 +47,7 @@ if($_SERVER['REQUEST_METHOD'] == 'POST') {
     $query = "SELECT password, salt
             FROM user
             WHERE username = '$username';";
-    $result = $base-> query($query);
+    $result = $base->execute($query);
     
     if( !$result ) //no such user exists
     {

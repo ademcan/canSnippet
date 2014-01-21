@@ -16,11 +16,7 @@
 
     $mytable ="snippets";
     $base = Factory::database($parameters);
-    
-    $count_query = "SELECT count(*) as count FROM $mytable";
-    $results_count = $base->query($count_query);
-    $row_count = $results_count->fetchArray();
-    $snippets_count = $row_count['count'];
+    $snippets_count = $base->execute("SELECT count(*) as count FROM ".$mytable)->fetchArray()['count'];
     
     $limit = 10;
     $page = 1;
@@ -38,12 +34,9 @@
     else {
         $query_name = "SELECT * FROM $mytable WHERE private != 'on' ORDER BY date DESC LIMIT $start_count,$limit";
     }
-    $results_name = $base->query($query_name);
+    $results_name = $base->execute($query_name)->fetchArray();
     
-    $settingsQuery = "SELECT * FROM settings";
-    $settingsInfo = $base->query($settingsQuery);
-    $settings = $settingsInfo->fetchArray();
-    $title = $settings["title"];
+    $title = $base->execute("SELECT * FROM settings")->fetchArray()["title"];
     
     echo '<h1>{ '.$title.' }</h1>';
     
@@ -52,7 +45,7 @@
     }
 
     // Loop and write all the recent snippets
-    while($row = $results_name->fetchArray())
+    while($row = $results_name)
     {
         $name = $row['name'];
         $code = $row['code'];
