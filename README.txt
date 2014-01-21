@@ -37,6 +37,10 @@ http://[YOUR_DOMAIN]/canSnippet/
 - Follow the unique instruction (i.e. fill in the form)
 - Remove the install.php file for better security
 - You are done ! Now you canSnippet...
+- If you use nginx add the following line to protect your sqlite file
+	location ~ \.sqlite {
+		deny all;
+	}
 
 Screenshots:
 http://ademcan.net/gallery/?dir=canSnippet
