@@ -1,4 +1,4 @@
-<?php 
+<?php
 /*
 @author: Ademcan (ademcan@ademcan.net)
 @name: menu.php
@@ -18,12 +18,10 @@ function isLoggedIn()
         <link rel="icon" type="image/jpg" href="images/canLogo.jpg">
         <link rel="alternate" type="application/rss+xml" title="Flux RSS" href="/rss/" />
         <?php
-        $dbname='snippets.sqlite';
-        $base=new SQLite3($dbname);
+        $base = Factory::database($parameters);
     
         $query_name = "SELECT * FROM settings ";
-        $results_name = $base->query($query_name);
-        $row = $results_name->fetchArray();
+        $row = $base->execute($query_name)->fetchArray();
         $theme = $row['theme'];
         $user = $row["username"];
         $title = $row["title"];
