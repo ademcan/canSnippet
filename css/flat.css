@@ -1,0 +1,273 @@
+
+body{
+    margin:0;
+    padding:0;
+}
+
+h1{
+    margin-left: 20px;
+    margin-top: 40px;
+    padding-bottom: 30px;
+}
+
+h2{
+    padding:0;
+    margin:0;
+    word-wrap: break-word;
+}
+
+div#content{
+    width:75%;
+    float:right;
+    margin-left: 2%;
+    margin-right: 2%;
+}
+
+div#menu{
+    position: fixed;
+    float:left;
+    width: 20%;
+    height: 100%;
+    padding-top:40px;
+    background-color: green;
+}
+
+div#browseLeftPane{
+    margin-top : 20px;
+    padding-top : 20px;
+    min-height : 100px;
+}
+
+div#languagePanel{
+    float:left;
+    width: 300px;
+    text-align: center;
+    overflow: hidden;
+}
+
+select {
+    width:300px;
+    color: #2ecc71;
+    background: #f5f2f0;
+    padding: 5px;
+    font-size: 16px;
+    line-height: 1;
+    border: 0;
+    border-radius: 5px;
+    height: 34px;
+    -webkit-appearance: none;
+}
+
+div#namePanel{
+    float:left;
+    width: 40%;
+    text-align: center;
+}
+
+div#codePanel{
+    width:100%;
+    height: 100px;
+    margin-top: 10px;
+}
+
+div#loginWindow{
+    width:300px;
+    margin:  100px auto;    
+    padding: 20px 20px ;
+    border: solid 3px;
+    border-color: #2ecc71;
+    border-radius: 5px;
+}
+
+div#installWindow{
+    width:400px;
+    text-align: center;
+    margin:  100px auto;    
+    padding: 20px 20px ;
+    border: solid 3px;
+    border-color: #2ecc71;
+}
+
+div#newSnippet{
+    width: 80%;
+    margin:  30px 20px;    
+    padding: 20px 20px ;
+    border: solid 3px;
+    border-color: #2ecc71;
+}
+
+input.login{
+    border-color:  #2ecc71;
+    box-shadow: none;
+    border-radius: 5px;
+}
+
+input.searchBox{
+    width: 70%;
+    margin: auto 0;
+}
+
+input.installButton{
+    top: 20px;
+    left:200px;
+    width: 100px;
+    height: 50px;
+    box-shadow: none;
+    border-style: none;
+    background-color: #2ecc71;
+    color: white;
+}
+
+input.installButton:hover{
+    background-color: #27ae60;
+}
+
+input.loginButton{
+    position:relative;
+    top: 20px;
+    left:200px;
+    width: 100px;
+    height: 50px;
+    box-shadow: none;
+    border-style: none;
+    background-color: #2ecc71;
+    color: white;
+}
+
+input.loginButton:hover{
+    background-color: #27ae60;
+}
+
+a{
+    color: #27ae60;
+    text-decoration: none;
+}
+
+a.deleteButton{
+    display: inline-block;
+    width: 100px;
+    height: 20px;
+    box-shadow: none;
+    border-style: none;
+    background-color: #e74c3c;
+    color: white;
+    padding-top: 4px;
+    text-align: center;
+}
+
+a.deleteButton:hover{
+    background-color: #c0392b;
+}
+
+a.editButton{
+    display: inline-block;
+    width: 100px;
+    height: 20px;
+    box-shadow: none;
+    border-style: none;
+    background-color: #3498db;
+    color: white;
+    padding-top: 4px;
+    text-align: center;
+}
+
+a.editButton:hover{
+    background-color: #2980b9;
+}
+
+a.button{
+    display: inline-block;
+    padding-top: 40px;
+    width: 100%;
+    height:60px;
+    color:white;
+    border-style: none;
+    margin-top: 5px;
+    background-color: #2ecc71;
+    text-align: center;
+}
+
+a.rssButton{
+    display: inline-block;
+    padding-top: 40px;
+    width: 100%;
+    height:60px;
+    color:white;
+    border-style: none;
+    margin-top: 5px;
+    background-color: #e67e22;
+    text-align: center;
+}
+
+a.rssButton:hover{
+    background-color:#d35400 ;
+}
+
+a.logoutButton{
+    display: inline-block;
+    padding-top: 40px;
+    width: 100%;
+    height:60px;
+    color:white;
+    border-style: none;
+    margin-top: 5px;
+    background-color: #e74c3c;
+    text-align: center;
+}
+
+a.logoutButton:hover{
+    background-color: #c0392b;
+}
+
+a.button:hover{
+    background-color: #27ae60;
+}
+
+hr{
+    width:95%; 
+    height:5px;
+    background-color:#2ecc71;
+    /*border-radius:20px;*/
+    border-color:#2ecc71;
+    border-style:none;
+}
+
+
+@media (max-width: 799px) {
+    div#content{
+        width:95%;
+        display:inline;
+        float:left;
+    }
+
+    div#menu{
+        position:static;
+        background-color: green;
+        float:left;
+        width:100%;
+        height:600px;
+    }
+
+    div#browseLeftPane{
+        margin-top: 20px;
+        padding-top: 20px;
+        min-height:100px;
+    }
+    
+    div#languagePanel{
+        width:100%;
+    }
+
+    div#namePanel{
+        width:100%;
+        clear:left;
+        padding-top: 30px;
+    }
+
+    div#codePanel{
+        padding-top: 40px;
+        width:100%;
+        height: 100%;
+        float:right;
+    }
+}
