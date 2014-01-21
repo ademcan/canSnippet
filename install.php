@@ -32,7 +32,18 @@ if (file_exists($config["dbname"])) {
                 <tr><td>Password Again :</td><td> <input type="password" name="pass2" /></td></tr>
                 </table>
                 </center>
+                <?php
+                if(!is_writable('./'))
+				{
+                ?>
                 <input type="submit" value="Install" class="installButton"/>
+                <?php
+				}else{
+                ?>
+                <h2>You don't have write permission on this directory <?= realpath('./')?></h2>
+                <?php
+				}
+                ?>
             </form>  
             
         </div>
