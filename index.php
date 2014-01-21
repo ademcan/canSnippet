@@ -4,6 +4,8 @@
     @name: index.php
     @description: initial page
     */
+    include "config.php";
+
     session_start();
 
     if (!file_exists("snippets.sqlite")) {
@@ -11,9 +13,9 @@
     } else {
     
     include 'includes/menu.php';
-    $dbname='snippets.sqlite';
+
     $mytable ="snippets";
-    $base=new SQLite3($dbname);
+    $base=new SQLite3($config["dbname"]);
     
     $count_query = "SELECT count(*) as count FROM $mytable";
     $results_count = $base->query($count_query);
