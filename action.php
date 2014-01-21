@@ -17,12 +17,12 @@
         $results_language = $base->query($query_language);
         while($row = $results_language->fetchArray())
         {
-            $code = htmlentities($row['code'], 0, "ISO-8859-1");
-            $language = htmlentities($row['language'], 0, "ISO-8859-1");
-            $date = htmlentities($row['date'], 0, "ISO-8859-1");
-            $name = htmlentities($row['name'], 0, "ISO-8859-1");
+            $code = htmlentities($row['code'], 0, "ISO-8859-15");
+            $language = htmlentities($row['language'], 0, "ISO-8859-15");
+            $date = htmlentities($row['date'], 0, "ISO-8859-15");
+            $name = htmlentities($row['name'], 0, "ISO-8859-15");
             $private = $row['private'];
-            $description = htmlentities($row['description'], 0, "ISO-8859-1");
+            $description = htmlentities($row['description'], 0, "ISO-8859-15");
             if ($private=="on"){
                 echo '<h2><a href="details.php?id='.$id.'">',$name ,'</a><img src="images/lockFlat.png" style="width:20px; height: 20px;padding-left:10px;" /></h2>';
             }
