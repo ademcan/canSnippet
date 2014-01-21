@@ -1,0 +1,10 @@
+<?php
+
+$parameters = array(
+	"db" => array(
+		"driver" => "pdo_sqlite",
+		"path" => "snippets.sqlite",
+	),
+
+	"dir" => "your kernel path"
+);
