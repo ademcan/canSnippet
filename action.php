@@ -4,9 +4,9 @@
   @name: action.php
   @description: action class for browse snippets page
 */
+    include "config.php";
 
     session_start();
-    $dbname='snippets.sqlite';
     $mytable ="snippets";
     $base=new SQLite3($dbname);
 
@@ -76,9 +76,8 @@
     // Search snippet
     if( isset($_POST["search"]) ){
         include 'includes/menu.php';
-        $dbname='snippets.sqlite';
         $mytable ="snippets";
-        $base=new SQLite3($dbname);
+        $base=new SQLite3($config["dbname"]);
         $search = SQLite3::escapeString($_POST['search']);
         
         if(isset($_SESSION['valid']) && $_SESSION['valid']){
