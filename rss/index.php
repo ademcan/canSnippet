@@ -18,13 +18,12 @@
 
     $mytable = "snippets";
     $base = Factory::database($parameters);
-    $query_name = "SELECT * FROM $mytable ";
-    $results_name = $base->query($query_name);
+    $query_name = "SELECT * FROM ".$mytable;
+    $row = $base->execute($query_name)->fetchArray();
        
-    while($row = $results_name->fetchArray())
-    {
+    while ($row) {
         // add only public snippets to the RSS feed
-        if ($row['private']!=="on"){
+        if ($row['private'] !== "on"){
             $rss .= '<item>';
             $rss .= '<title>' .$row['name']. '</title>';
             $rss .= '<description>' .$row['description']. '</description>';

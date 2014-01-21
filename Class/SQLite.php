@@ -13,10 +13,6 @@ class SQLite implements IDatabase {
 		$this->lastRequest = null;
 	}
 
-	public function getPath() {
-		return $this->path;
-	}
-
 	//Implements IDatabase
 	public function create() {
 		$this->open();
@@ -35,7 +31,7 @@ class SQLite implements IDatabase {
 	}
 
 	public function exist() {
-		if (file_exists($this->path)) {
+		if (file_exists($this->kernelDir."/".$this->path)) {
 		    return true;
 		}
 		return false;

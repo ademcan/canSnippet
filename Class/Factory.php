@@ -18,7 +18,7 @@ class Factory {
 			default:
 				throw new Exception("Driver unknown !", 1);
 		}
-
+		
 		if (!$db->exist()) {
 			if (false === strpos($_SERVER["REQUEST_URI"], "install.php")) {
 				//redirect
