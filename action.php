@@ -17,12 +17,12 @@
         $results_language = $base->query($query_language);
         while($row = $results_language->fetchArray())
         {
-            $code = htmlentities($row['code'], 0, "ISO-8859-15");
-            $language = htmlentities($row['language'], 0, "ISO-8859-15");
-            $date = htmlentities($row['date'], 0, "ISO-8859-15");
-            $name = htmlentities($row['name'], 0, "ISO-8859-15");
+            $code = iconv("ISO-8859-15", "UTF-8",$row['code']);
+            $language = $row['language'];
+            $date = $row['date'];
+            $name = iconv("ISO-8859-15", "UTF-8",$row['name']);
             $private = $row['private'];
-            $description = htmlentities($row['description'], 0, "ISO-8859-15");
+            $description = iconv("ISO-8859-15", "UTF-8",$row['description']);
             if ($private=="on"){
                 echo '<h2><a href="details.php?id='.$id.'">',$name ,'</a><img src="images/lockFlat.png" style="width:20px; height: 20px;padding-left:10px;" /></h2>';
             }
@@ -66,7 +66,7 @@
             <option selected >Choose a snippet </option>';
         while($row = $results_language->fetchArray())
         {
-            $name = htmlentities($row['name'], 0, "ISO-8859-1");
+            $name = iconv("ISO-8859-15", "UTF-8",$row['name']);
             $id = $row['ID'];
             echo '<option value="'.$id.'">'.$name.'</option>';
         }
