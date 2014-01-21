@@ -6,6 +6,7 @@
   REMOVE AFTER SUCCESSFUL INSTALLATION
  */
 include "config.php";
+include "autoload.php";
 
 if (file_exists($config["dbname"])) {
     echo "Installation process already done";
@@ -45,7 +46,9 @@ if (file_exists($config["dbname"])) {
             if (!class_exists('SQLite3'))
                 die("SQLite 3 NOT supported.");
 
-            $base = new SQLite3($config["dbname"]);
+            $base = Factory::database($config);
+
+            /*$base = new SQLite3($config["dbname"]);*/
 
             $query = "CREATE TABLE user(
                     username VARCHAR(30) NOT NULL UNIQUE,
