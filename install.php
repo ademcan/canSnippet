@@ -5,8 +5,9 @@
   @description: installation page
   REMOVE AFTER SUCCESSFUL INSTALLATION
  */
+include "config.php";
 
-if (file_exists("snippets.sqlite")) {
+if (file_exists($config["dbname"])) {
     echo "Installation process already done";
 } else {
 
@@ -41,12 +42,10 @@ if (file_exists("snippets.sqlite")) {
         if ($_SERVER['REQUEST_METHOD'] == 'POST') {
 
             // Create users table
-            $dbname = 'snippets.sqlite';
-
             if (!class_exists('SQLite3'))
                 die("SQLite 3 NOT supported.");
 
-            $base = new SQLite3($dbname);
+            $base = new SQLite3($config["dbname"]);
 
             $query = "CREATE TABLE user(
                     username VARCHAR(30) NOT NULL UNIQUE,

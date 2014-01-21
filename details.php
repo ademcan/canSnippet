@@ -6,10 +6,12 @@
  */
 
     session_start();
+
+    include "config.php";
     include 'includes/menu.php';
-    $dbname='snippets.sqlite';
+
     $mytable ="snippets";
-    $base=new SQLite3($dbname);
+    $base=new SQLite3($config["dbname"]);
     
     $query_name = "SELECT * FROM $mytable WHERE ID=".intval($_GET["id"])." ";
     $results_name = $base->query($query_name);
