@@ -49,7 +49,7 @@ function isLoggedIn()
         </center>
         <a href="index.php" class="button"> Home </a>
         <a href="browse.php" class="button"> Browse </a>
-        <a href="rss/" class="rssButton">RSS </a>
+        <a href="rss/index.php" class="rssButton">RSS </a>
         <?php
             if(isLoggedIn())
             {

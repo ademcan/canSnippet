@@ -4,7 +4,7 @@
     @name: index.php
     @description: initial page
     */
-    include "config.php";
+    include "autoload.php";
 
     session_start();
 
@@ -15,7 +15,7 @@
     include 'includes/menu.php';
 
     $mytable ="snippets";
-    $base=new SQLite3($config["dbname"]);
+    $base = Factory::database($parameters);
     
     $count_query = "SELECT count(*) as count FROM $mytable";
     $results_count = $base->query($count_query);

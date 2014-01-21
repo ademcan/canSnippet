@@ -4,6 +4,7 @@
   @name: action.php
   @description: action class for admin panel
 */
+include "../autoload.php";
 
 if (!isset($_SESSION))
     session_start();
@@ -22,9 +23,8 @@ if(!isset($_GET["action"]))
 // Delete a snippet based on its identifier
 if (($_GET["action"] == "delete")) {
     // connection to the database
-    $dbname = '../snippets.sqlite';
     $mytable = "snippets";
-    $base = new SQLite3($dbname);
+    $base = Factory::database($parameters);
     // sql command to delete the snippet
     $query_name = "DELETE FROM $mytable WHERE ID=" . $_GET["id"] . "";
     $results_name = $base->query($query_name);
@@ -34,9 +34,8 @@ if (($_GET["action"] == "delete")) {
 
 // Edit a snippet based on its identifier
 if (($_GET["action"] == "edit")) {
-    $dbname = '../snippets.sqlite';
     $mytable = "snippets";
-    $base = new SQLite3($dbname);
+    $base = Factory::database($parameters);
     $query_name = "SELECT * FROM $mytable WHERE ID=" . $_GET["id"] . " ";
     $results_name = $base->query($query_name);
     // Edit page
@@ -134,9 +133,8 @@ if (isset($_POST["add"])) {
     $private = (isset($_POST['private']) && $_POST['private'] = "on")?"on":"off";
     $date = date("F j, Y - H:i");
     // connect to the database
-    $dbname = '../snippets.sqlite';
     $mytable = "snippets";
-    $base = new SQLite3($dbname);
+    $base = Factory::database($parameters);
 
     $code = iconv('UTF-8', 'ISO-8859-15', htmlspecialchars($_POST['code'], ENT_QUOTES));
     

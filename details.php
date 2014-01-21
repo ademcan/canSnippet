@@ -7,11 +7,11 @@
 
     session_start();
 
-    include "config.php";
+    include "autoload.php";
     include 'includes/menu.php';
 
     $mytable ="snippets";
-    $base=new SQLite3($config["dbname"]);
+    $base = Factory::database($parameters);
     
     $query_name = "SELECT * FROM $mytable WHERE ID=".intval($_GET["id"])." ";
     $results_name = $base->query($query_name);

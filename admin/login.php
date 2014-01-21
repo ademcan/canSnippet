@@ -4,6 +4,7 @@
   @name: login.php
   @description: login page
  */
+include "../autoload.php";
 
 session_start();
 ?>
@@ -30,15 +31,14 @@ session_start();
 <?php
 
 // Checking all login information 
-if($_SERVER['REQUEST_METHOD'] == 'POST'){    
+if($_SERVER['REQUEST_METHOD'] == 'POST') {
     // Create users table
-    $dbname='../snippets.sqlite';
     $mytable ="user";
 
     if(!class_exists('SQLite3'))
       die("SQLite 3 NOT supported.");
 
-    $base=new SQLite3($dbname);
+    $base = Factory::database($parameters);
 
     $username = $_POST['username'];
     $password = $_POST['password'];

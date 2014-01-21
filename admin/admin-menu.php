@@ -4,6 +4,7 @@
   @name: admin-menu.php
   @description: menu for the admin panel
  */
+include "../autoload.php";
 
 if (!isset($_SESSION))
     session_start();
@@ -16,8 +17,7 @@ if (!isset($_SESSION['valid']) || !$_SESSION['valid'])
 <html>
     <head>
         <?php
-        $dbname = '../snippets.sqlite';
-        $base = new SQLite3($dbname);
+        $base = Factory::database($parameters);
         $queryT = "SELECT * FROM settings ";
         $resultsT = $base->query($queryT);
         $rowT = $resultsT->fetchArray();

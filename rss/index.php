@@ -1,10 +1,11 @@
 <?php
-
     /*
     @author: Ademcan (ademcan@ademcan.net)
     @name: index.php
     @description: creation of the rss feed
     */
+
+    include "../autoload.php";
 
     header("Content-Type: application/rss+xml; charset=ISO-8859-1");
     $rss = '<?xml version="1.0" encoding="ISO-8859-1"?>';
@@ -15,9 +16,8 @@
     $rss .= '<description>This is an example RSS feed</description>';
     $rss .= '<language>en-us</language>';
 
-    $dbname='../snippets.sqlite';
-    $mytable ="snippets";
-    $base=new SQLite3($dbname);
+    $mytable = "snippets";
+    $base = Factory::database($parameters);
     $query_name = "SELECT * FROM $mytable ";
     $results_name = $base->query($query_name);
        
@@ -36,5 +36,3 @@
     $rss .= '</rss>';
  
     echo $rss;
-
-?>

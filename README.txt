@@ -43,3 +43,6 @@ http://ademcan.net/gallery/?dir=canSnippet
 
 Demo :
 http://ademcan.net/canSnippet/
+
+Install:
+- Copy parameters.php-dist to parameters.php and add your custom value.
