@@ -30,7 +30,7 @@
     else {
         $query_name = "SELECT * FROM $mytable WHERE private != 'on' ORDER BY date DESC LIMIT $start_count,$limit";
     }
-    $results_name = $base->execute($query_name)->fetchArray();
+    $row = $base->execute($query_name)->fetchArray();
     
     $title = $base->execute("SELECT * FROM settings")->fetchArray()["title"];
     
@@ -41,7 +41,7 @@
     }
 
     // Loop and write all the recent snippets
-    while($row = $results_name)
+    while($row)
     {
         $name = $row['name'];
         $code = $row['code'];
