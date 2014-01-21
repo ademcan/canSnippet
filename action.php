@@ -48,7 +48,7 @@ include "autoload.php";
     }
 
     if(isset($_POST["action"]) && $_POST['action']=="getname" ){
-        $language = SQLite3::escapeString($_POST["language"]);
+        $language = $base->escape($_POST["language"]);
         // get entry
         if(isset($_SESSION['valid']) && $_SESSION['valid']){
             $query_language = "SELECT * FROM $mytable where language = '$language' ";
@@ -78,7 +78,7 @@ include "autoload.php";
         include 'includes/menu.php';
         $mytable ="snippets";
         $base = Factory::database($parameters);
-        $search = SQLite3::escapeString($_POST['search']);
+        $search = $base->escape($_POST['search']);
         
         if(isset($_SESSION['valid']) && $_SESSION['valid']){
             $query_name = "SELECT * FROM $mytable WHERE name LIKE '%$search%' OR description LIKE '%$search%' OR language LIKE '%$search%'";

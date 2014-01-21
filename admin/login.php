@@ -43,7 +43,7 @@ if($_SERVER['REQUEST_METHOD'] == 'POST') {
     $username = $_POST['username'];
     $password = $_POST['password'];
     //connect to the database here
-    $username = SQLite3::escapeString($username);
+    $username = $base->escape($username);
     $query = "SELECT password, salt
             FROM user
             WHERE username = '$username';";

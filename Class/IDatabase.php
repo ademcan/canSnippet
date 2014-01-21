@@ -2,8 +2,9 @@
 
 interface IDatabase {
 	public function create();
-	public function exist();
-	public function open();
+	public function escape($sql);
 	public function execute($sql);
+	public function exist();
 	public function fetchArray();
+	public function open();
 }

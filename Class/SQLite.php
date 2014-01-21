@@ -22,6 +22,10 @@ class SQLite implements IDatabase {
 		$this->open();
 	}
 
+	public function escape($value) {
+		return SQLite3::escapeString($value);
+	}
+
 	public function execute($sql) {
 		$this->open();
 

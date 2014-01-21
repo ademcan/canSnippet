@@ -44,8 +44,9 @@ if ($base->exist()) {
         if ($_SERVER['REQUEST_METHOD'] == 'POST') {
 
             // Create users table
-            if (!class_exists('SQLite3'))
-                die("SQLite 3 NOT supported.");
+            if (!extension_loaded($parameters["db"]["driver"])) {
+                die('PDO unavailable');
+            }
 
             $base = Factory::database($parameters);
 
