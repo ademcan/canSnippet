@@ -20,8 +20,10 @@ class Factory {
 		}
 
 		if (!$db->exist()) {
-			//redirect
-			//header('Location: '."/install.php", true, 302);
+			if (false === strpos($_SERVER["REQUEST_URI"], "install.php")) {
+				//redirect
+				header("Location:install.php");
+			}
 		}
 
 		return $db;

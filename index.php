@@ -7,10 +7,6 @@
     include "autoload.php";
 
     session_start();
-
-    if (!file_exists("snippets.sqlite")) {
-        echo "<script>location.href='install.php';</script>";
-    } else {
     
     include 'includes/menu.php';
 
@@ -93,5 +89,4 @@
     }
     echo '<center><font size="1">Powered by <a href="http://www.ademcan.net/index.php?d=2014/01/16/08/47/25-save-and-share-your-snippets-with-cansnippet">canSnippet</a> v1.0 beta - by ademcan<font></center>';
     echo '<br></div> </body></html>';
-    }
 ?>
