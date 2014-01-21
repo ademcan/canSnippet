@@ -8,7 +8,7 @@
 
     session_start();
     $mytable ="snippets";
-    $base=new SQLite3($dbname);
+    $base=new SQLite3($config["dbname"]);
 
     if(isset($_POST["action"]) && $_POST['action']=="getcode"){
         $id = $_POST["id"];
