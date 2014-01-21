@@ -1,4 +1,6 @@
 <?php
-require_once("Factory.php");
-require_once("IDatabase.php");
-require_once("SQLite.php");
+require_once("Class/Factory.php");
+require_once("Class/IDatabase.php");
+require_once("Class/SQLite.php");
+
+include "config.php";

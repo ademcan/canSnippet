@@ -5,7 +5,6 @@
   @description: installation page
   REMOVE AFTER SUCCESSFUL INSTALLATION
  */
-include "config.php";
 include "autoload.php";
 
 if (file_exists($config["dbname"])) {

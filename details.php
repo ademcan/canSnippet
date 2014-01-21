@@ -7,7 +7,7 @@
 
     session_start();
 
-    include "config.php";
+    include "autoload.php";
     include 'includes/menu.php';
 
     $mytable ="snippets";

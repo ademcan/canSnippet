@@ -5,7 +5,7 @@
   @description: browse page allow users to choose a language and a corresponding snippet
  */
     session_start();
-    include "config.php";
+include "autoload.php";
     include 'includes/menu.php';
     $mytable ="snippets";
     $base=new SQLite3($config["dbname"]);

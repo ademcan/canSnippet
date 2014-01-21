@@ -4,7 +4,7 @@
     @name: index.php
     @description: initial page
     */
-    include "config.php";
+    include "autoload.php";
 
     session_start();
 

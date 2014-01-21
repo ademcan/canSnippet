@@ -4,7 +4,7 @@
   @name: action.php
   @description: action class for browse snippets page
 */
-    include "config.php";
+include "autoload.php";
 
     session_start();
     $mytable ="snippets";
