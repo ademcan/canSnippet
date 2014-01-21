@@ -4,15 +4,15 @@
   @name: index.php
   @description: index page for the admin panel
  */
+include "../autoload.php";
 
 session_start();
 
 if (isset($_SESSION['valid']) && $_SESSION['valid']) {
     // CONNECTION TO THE DATABASE
     include 'admin-menu.php';
-    $dbname = '../snippets.sqlite';
     $mytable = "snippets";
-    $base = new SQLite3($dbname);
+    $base = Factory::database($parameters);
 
     $count_query = "SELECT count(*) as count FROM $mytable";
     $results_count = $base->query($count_query);

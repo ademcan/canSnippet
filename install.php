@@ -7,7 +7,7 @@
  */
 include "autoload.php";
 
-if (file_exists($config["dbname"])) {
+if (file_exists($parameters["dbname"])) {
     echo "Installation process already done";
 } else {
 
@@ -45,7 +45,7 @@ if (file_exists($config["dbname"])) {
             if (!class_exists('SQLite3'))
                 die("SQLite 3 NOT supported.");
 
-            $base = Factory::database($config);
+            $base = Factory::database($parameters);
 
             $query = "CREATE TABLE user(
                     username VARCHAR(30) NOT NULL UNIQUE,

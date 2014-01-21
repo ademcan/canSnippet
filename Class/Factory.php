@@ -1,12 +1,12 @@
 <?php
 
 class Factory {
-	public static function database($config) {
+	public static function database($parameters) {
 		$db = null;
 
-		switch ($config["dbdriver"]) {
+		switch ($parameters["db"]["driver"]) {
 			case 'pdo_sqlite':
-				$db = new SQLite($config["db"]["path"]);
+				$db = new SQLite($parameters["dir"], $parameters["db"]["path"]);
 				break;
 
 			/*case 'pdo_mysql':

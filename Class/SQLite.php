@@ -1,9 +1,11 @@
 <?php
 
 class SQLite implements IDatabase {
+	protected $kernelDir;
 	protected $path;
 
-	public function __construct($path) {
+	public function __construct($kernelDir, $path) {
+		$this->kernelDir = $kernelDir;
 		$this->path = $path;
 	}
 
@@ -21,6 +23,6 @@ class SQLite implements IDatabase {
 	}
 
 	public function open() {
-		return new SQLite3($this->path);
+		return new SQLite3($this->kernelDir."/".$this->path);
 	}
 }

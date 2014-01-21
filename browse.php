@@ -8,7 +8,7 @@
     include "autoload.php";
     include 'includes/menu.php';
     $mytable ="snippets";
-    $base = Factory::database($config);
+    $base = Factory::database($parameters);
 ?>
 
 <h1>Browse snippets</h1>

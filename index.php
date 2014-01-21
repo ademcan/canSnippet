@@ -15,7 +15,7 @@
     include 'includes/menu.php';
 
     $mytable ="snippets";
-    $base = Factory::database($config);
+    $base = Factory::database($parameters);
     
     $count_query = "SELECT count(*) as count FROM $mytable";
     $results_count = $base->query($count_query);

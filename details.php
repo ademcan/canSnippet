@@ -11,7 +11,7 @@
     include 'includes/menu.php';
 
     $mytable ="snippets";
-    $base = Factory::database($config);
+    $base = Factory::database($parameters);
     
     $query_name = "SELECT * FROM $mytable WHERE ID=".intval($_GET["id"])." ";
     $results_name = $base->query($query_name);
