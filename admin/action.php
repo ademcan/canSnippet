@@ -4,7 +4,7 @@
   @name: action.php
   @description: action class for admin panel
 */
-
+require_once('../config.php');
 if (!isset($_SESSION))
     session_start();
 
@@ -24,9 +24,9 @@ if(!isset($_GET["action"]))
 // Delete a snippet based on its identifier
 if (($_GET["action"] == "delete")) {
     // connection to the database
-    $dbname = '../snippets.sqlite';
+    "../".$config['dbname'] = '../snippets.sqlite';
     $mytable = "snippets";
-    $base = new SQLite3($dbname);
+    $base = new SQLite3("../".$config['dbname']);
     // sql command to delete the snippet
     $query_name = "DELETE FROM $mytable WHERE ID=" . $_GET["id"] . "";
     $results_name = $base->query($query_name);
@@ -36,9 +36,9 @@ if (($_GET["action"] == "delete")) {
 
 // Edit a snippet based on its identifier
 if (($_GET["action"] == "edit")) {
-    $dbname = '../snippets.sqlite';
+    "../".$config['dbname'] = '../snippets.sqlite';
     $mytable = "snippets";
-    $base = new SQLite3($dbname);
+    $base = new SQLite3("../".$config['dbname']);
     $query_name = "SELECT * FROM $mytable WHERE ID=" . $_GET["id"] . " ";
     $results_name = $base->query($query_name);
     // Edit page
@@ -136,9 +136,9 @@ if (isset($_POST["add"])) {
     $private = (isset($_POST['private']) && $_POST['private'] = "on")?"on":"off";
     $date = date("F j, Y - H:i");
     // connect to the database
-    $dbname = '../snippets.sqlite';
+    "../".$config['dbname'] = '../snippets.sqlite';
     $mytable = "snippets";
-    $base = new SQLite3($dbname);
+    $base = new SQLite3("../".$config['dbname']);
 
     $code = iconv('UTF-8', 'ISO-8859-15', htmlspecialchars($_POST['code'], ENT_QUOTES));
     
@@ -185,6 +185,43 @@ if (($_GET["action"] == "add")) {
             <input name="add" type="hidden" />
             <input class="loginButton" type="submit" value="Add snippet" class="submit"/>
 
+        </form>
+    </div>
+    </div>
+    </body>
+    </html>
+    <?php
+}
+
+// Save the new css_prism theme
+if (isset($_POST["prism_theme"])) {
+	$base = new SQLite3("../".$config['dbname']);
+	$query = "UPDATE settings set prismtheme='".$_POST['prism_theme']."' ";
+    $base->exec($query);
+    // returns to the main admin page
+    header("location:index.php");
+}
+
+// Page for adding new snippet
+if (($_GET["action"] == "prism_theme")) {
+    include 'admin-menu.php';
+    ?>
+
+    <h1>Add a new snippet</h1>
+
+    <div id="newSnippet">
+
+        <form id="form" name="prism_theme" method="post" action="action.php">
+            <select name="prism_theme">
+            	<option value="<?=$config["defaultPrismCSS"]?>">Default</option>
+            	<?php
+            	$files = scandir("../".dirname($config["defaultPrismCSS"]).'/prism_theme/');
+            	for ($i=0;$i<count($files);$i++)
+					if(preg_match("/.+\.css/",$files[$i]))
+						echo '<option value="'.dirname($config["defaultPrismCSS"]).'/prism_theme/'.$files[$i].'">'.$files[$i].'</option>';
+            	?>
+            </select>
+	        <input class="loginButton" type="submit" value="Change CSS" class="submit"/>
         </form>
     </div>
     </div>
