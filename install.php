@@ -33,8 +33,18 @@ if (file_exists($config["dbname"])) {
                 </table>
                 </center>
                 
+                <?php
+                if(!is_writable(dirname($config["dbname"])))
+                {
+                ?>
                 <input type="submit" value="Install" class="installButton"/>
-
+                <?php
+                }else{
+                ?>
+                <h2>You d'ont have write permission on this directory <?= realpath(dirname($config["dbname"]))?></h2>
+                <?php
+                }
+                ?>
             </form>  
             
         </div>
