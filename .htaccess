@@ -1,6 +1,3 @@
-RewriteEngine On
-RewriteBase /
-
 # Protect the htaccess file
 <Files .htaccess>
 Order Allow,Deny
