@@ -9,8 +9,10 @@ if (!isset($_SESSION))
     session_start();
 
 // we block the acces to no authenticated people
-if (!isset($_SESSION['valid']) || !$_SESSION['valid'])
+if (!isset($_SESSION['valid']) || !$_SESSION['valid']) {
     header("location:login.php");
+}
+else {
 ?>
 
 <html>
@@ -43,3 +45,4 @@ if (!isset($_SESSION['valid']) || !$_SESSION['valid'])
             <a href="../logout.php" class="logoutButton"> Logout </a>
         </div>
     <div id="content">
+<?php } ?>

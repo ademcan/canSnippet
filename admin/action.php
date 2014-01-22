@@ -9,9 +9,11 @@ if (!isset($_SESSION))
     session_start();
 
 // we block the acces to no authenticated people
-if (!isset($_SESSION['valid']) || !$_SESSION['valid'])
+if (!isset($_SESSION['valid']) || !$_SESSION['valid']) {
     header("location:login.php");
-
+}
+else {
+    
 ob_start();
 setlocale(LC_CTYPE, 'fr_FR.UTF-8');
 
@@ -262,4 +264,6 @@ if (($_GET["action"] == "preferences")) {
 }
 
 ob_flush();
+
+}
 ?>
