@@ -4,6 +4,7 @@
 @name: menu.php
 @description: menu for the user interface
 */
+require_once("./config.php");
 
 function isLoggedIn()
 {
@@ -33,6 +34,7 @@ function isLoggedIn()
         <meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-15">
         <link href="css/prism.css" rel="stylesheet" />
         <script src="js/prism.js"></script>
+	<?=mod_prism_loader("./js")?>
         <title>
             <?php echo $title; ?>
         </title>
