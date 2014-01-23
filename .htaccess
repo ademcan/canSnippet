@@ -10,3 +10,5 @@ Order Allow,Deny
 Deny from all
 </Files>
 
+# Disabling magic quotes
+SetEnv MAGIC_QUOTES 0 
