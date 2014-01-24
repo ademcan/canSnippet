@@ -34,6 +34,13 @@ if (isset($_SESSION['valid']) && $_SESSION['valid']) {
     if ($snippets_count == 0){
         echo "You don't have any snippet yet, you can add new snippets from 'New snippet' menu.";
     }
+
+    //load conf for prism modification
+    $conf_mod = conf_mod_prism_loader("../js");
+    $pre_class = "";
+    for ($i=0; $i < count($conf_mod); $i++)
+        if(isset($conf_mod[$i]->pre))
+            $pre_class = " ".$conf_mod[$i]->pre;
     
     // Loop and write all the recent snippets
     while($row = $results_name->fetchArray())
@@ -65,7 +72,7 @@ if (isset($_SESSION['valid']) && $_SESSION['valid']) {
         echo '<font size="1"><i>'.$language.'</i> - '.$date.'</font>';
         echo '<br><img src="../images/info.png" style="vertical-align: middle;"/>';
         echo '&nbsp;&nbsp;'.nl2br($description);
-        echo '<section class="' . $languageClass . '"> <pre><code>' . $row['code'] . '</code></pre> </section>';
+        echo '<section class="' . $languageClass . '"> <pre class="'.$pre_class.'"><code>' . $row['code'] . '</code></pre> </section>';
         echo '<a href="action.php?action=edit&id=' . $row['ID'] . '" class="editButton">Edit</a>';
         echo '<a href="action.php?action=delete&id=' . $row['ID'] . '" onclick="return confirm(\'Do you really want to delete this snippet ?\');" class="deleteButton">Delete</a>';
         echo '<hr><br>';

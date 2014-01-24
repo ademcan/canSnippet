@@ -15,6 +15,14 @@
         // get entry
         $query_language = "SELECT * FROM $mytable where id = '$id' ";
         $results_language = $base->query($query_language);
+
+	//load conf for prism modification
+	$conf_mod = conf_mod_prism_loader("./js");
+	$pre_class = "";
+	for ($i=0; $i < count($conf_mod); $i++)
+		if(isset($conf_mod[$i]->pre))
+			$pre_class = " ".$conf_mod[$i]->pre;
+
         while($row = $results_language->fetchArray())
         {
             $code = iconv("ISO-8859-15", "UTF-8",$row['code']);
@@ -42,7 +50,7 @@
             echo '<font size="1"><i>'.$language.'</i> - '.$date.'</font><br>';
             echo '<img src="images/info.png" style="vertical-align: middle;"/>';
             echo '&nbsp;&nbsp;'.nl2br($description);
-            echo '<section class="'.$languageClass.'"><pre><code>'.$code.'</code></pre></section>' ;
+            echo '<section class="'.$languageClass.'"><pre class="'.$pre_class.'"><code>'.$code.'</code></pre></section>' ;
         }
         
     }
@@ -90,6 +98,13 @@
 
         echo '<h1> Search results for "'.$_POST['search'].'"</h1>';
         
+	//load conf for prism modification
+	$conf_mod = conf_mod_prism_loader("./js");
+	$pre_class = "";
+	for ($i=0; $i < count($conf_mod); $i++)
+		if(isset($conf_mod[$i]->pre))
+			$pre_class = " ".$conf_mod[$i]->pre;
+
         // Loop and write all the recent snippets
         while($row = $results_name->fetchArray())
         {
@@ -119,7 +134,7 @@
             echo '<font size="1"><i>'.$language.'</i> - '.$date.'</font><br>';
             echo '<img src="images/info.png" style="vertical-align: middle;"/>';
             echo '&nbsp;&nbsp;'.nl2br($description);
-            echo '<section class="'.$languageClass.'"> <pre><code>'.$code.'</code></pre> </section>' ;
+            echo '<section class="'.$languageClass.'"> <pre class="'.$pre_class.'"><code>'.$code.'</code></pre> </section>' ;
             echo '<hr style="width:95%; height:5px;background-color:#2ecc71;border-radius:20px;border-color:#2ecc71;border-style:none;">';
         }
         echo '</div></body></html>';        

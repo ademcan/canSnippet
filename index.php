@@ -51,6 +51,12 @@
         echo "You don't have any snippet yet, you can add new snippets from the Admin interface.";
     }
 
+	//load conf for prism modification
+	$conf_mod = conf_mod_prism_loader("./js");
+	$pre_class = "";
+	for ($i=0; $i < count($conf_mod); $i++)
+		if(isset($conf_mod[$i]->pre))
+			$pre_class = " ".$conf_mod[$i]->pre;
     // Loop and write all the recent snippets
     while($row = $results_name->fetchArray())
     {
@@ -79,7 +85,7 @@
         echo '<font size="1"><i>'.$language.'</i> - '.$date.'</font><br>';
         echo '<img src="images/info.png" style="vertical-align: middle;"/>';
         echo '&nbsp;&nbsp;'.nl2br($description);
-        echo '<section class="'.$languageClass.'"> <pre><code>'.$code.'</code></pre> </section>' ;
+        echo '<section class="'.$languageClass.'"> <pre class="'.$pre_class.'"><code>'.$code.'</code></pre> </section>' ;
         echo '<hr><br>';
     }
     
