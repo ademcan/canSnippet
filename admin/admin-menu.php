@@ -8,6 +8,8 @@
 if (!isset($_SESSION))
     session_start();
 
+require_once('../config.php');
+
 // we block the acces to no authenticated people
 if (!isset($_SESSION['valid']) || !$_SESSION['valid']) {
     header("location:login.php");
@@ -28,7 +30,7 @@ else {
         ?>
         <link rel="icon" type="image/jpg" href="../images/canLogo.jpg">
         <meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-15">
-        <link href="../css/prism.css" rel="stylesheet" />
+        <link href="../<?=prismTheme()?>" rel="stylesheet" />
         <script src="../js/prism.js"></script>
         <title>
             canSnippet administration
@@ -40,6 +42,7 @@ else {
             <a href="index.php" class="button"> My snippets </a>
             <a href="action.php?action=add" class="button"> New snippet </a>
             <a href="action.php?action=preferences" class="button"> Preferences </a>
+            <a href="action.php?action=prism_theme" class="button"> Select Prism theme </a>
             <hr>
             <a href="../index.php" class="button"> Back to canSnippet </a>
             <a href="../logout.php" class="logoutButton"> Logout </a>

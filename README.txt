@@ -42,6 +42,9 @@ http://[YOUR_DOMAIN]/canSnippet/
 		deny all;
 	}
 
+Add theme for prism :
+Simply put your css file in css/prism_them and go in admin interface to select your theme
+
 Screenshots:
 http://ademcan.net/gallery/?dir=canSnippet
 
