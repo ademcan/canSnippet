@@ -41,7 +41,7 @@ if (file_exists($config["dbname"])) {
                 <?php
                 }else{
                 ?>
-                <h2>You d'ont have write permission on this directory <?= realpath(dirname($config["dbname"]))?></h2>
+                <h2>You don't have write permissions on this directory <?= realpath(dirname($config["dbname"]))?></h2>
                 <?php
                 }
                 ?>
