@@ -21,6 +21,7 @@
     echo '<h1 style="padding-top:50px;"> '.$name;
 
     $private = $row['private'];
+    $lines = $row['lines'];
     if ($private=="on"){
         echo '<img src="images/lockFlat.png" style="width:20px; height: 20px;padding-left:10px;" />';
     }
@@ -30,6 +31,7 @@
     $language = $row['language'];
     $date = $row['date'];
     $description = $row['description'];
+    $highlight = $row['highlight'];
 
     if ($language=="html"){
         $languageClass = "language-markup";
@@ -44,7 +46,15 @@
     echo '<font size="1"><i>'.$language.'</i> - '.$date.'</font><br>';
     echo '<img src="images/info.png" style="vertical-align: middle;"/>';
     echo '&nbsp;&nbsp;'.nl2br($description);
-    echo '<section class="'.$languageClass.'"> <pre><code>'.$code.'</code></pre> </section>' ;
+    if ($lines=="on"){
+        echo '<section class="'.$languageClass.'"> <pre class="line-numbers"><code>'.$code.'</code></pre> </section>';
+    }
+    else if ($highlight!=""){
+        echo '<section class="'.$languageClass.'"> <pre data-line='.$highlight.'><code>'.$code.'</code></pre> </section>';   
+    }
+    else {
+        echo '<section class="'.$languageClass.'"> <pre><code>'.$code.'</code></pre> </section>' ;
+    }
     echo '<hr style="width:95%; height:5px;background-color:#2ecc71;border-radius:20px;border-color:#2ecc71;border-style:none;">';
     echo '</div></body></html>';
 ?>
