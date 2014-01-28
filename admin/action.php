@@ -145,8 +145,8 @@ if (isset($_POST["add"])) {
     $description = str_replace($search, $replace, $description);
 
     $code = $_POST['code'];
-    $private = (isset($_POST['private']) && $_POST['private'] = "on")?"on":"off";
-    $lines = (isset($_POST['lines']) && $_POST['lines'] = "on")?"on":"off";
+    $private = (isset($_POST['private']) && $_POST['private'] == "on")?"on":"off";
+    $lines = (isset($_POST['lines']) && $_POST['lines'] == "on")?"on":"off";
     $highlight = $_POST['highlight'];
     $date = date("F j, Y - H:i");
     // connect to the database
