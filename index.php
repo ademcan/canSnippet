@@ -58,8 +58,6 @@
         $code = $row['code'];
         $language = $row['language'];
         $private = $row['private'];
-        $lines = $row['lines'];
-        $highlight = $row['highlight'];
         $date = $row['date'];
         $id = $row['ID'];
         $description = $row['description'];
@@ -81,15 +79,7 @@
         echo '<font size="1"><i>'.$language.'</i> - '.$date.'</font><br>';
         echo '<img src="images/info.png" style="vertical-align: middle;"/>';
         echo '&nbsp;&nbsp;'.nl2br($description);
-        if ($lines=="on"){
-            echo '<section class="'.$languageClass.'"> <pre class="line-numbers"><code>'.$code.'</code></pre> </section>';
-        }
-        else if ($highlight!=""){
-            echo '<section class="'.$languageClass.'"> <pre data-line='.$highlight.'><code>'.$code.'</code></pre> </section>';   
-        }
-        else {
-            echo '<section class="'.$languageClass.'"> <pre><code>'.$code.'</code></pre> </section>' ;
-        }
+        echo '<section class="'.$languageClass.'"> <pre><code>'.$code.'</code></pre> </section>' ;
         echo '<hr><br>';
     }
     
