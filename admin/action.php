@@ -95,8 +95,18 @@ if (($_GET["action"] == "edit")) {
         
             <tr><td>Code</td><td><textarea name="code" style="width:500px;height:300px;">';
         echo $row['code'];
-        echo '</textarea></td></tr>
-            <tr><td>Private</td><td><input type="checkbox" name="private" value="on" ';
+        echo '</textarea></td></tr>';
+        echo '<tr><td>Line numbers</td><td><input type="checkbox" name="lines" value="on" ';
+        if ($row['lines'] == "on") {
+            echo "checked";
+        } echo'></td></tr>';
+
+        echo '<tr><td>Highlight lines</td><td><input type="text" name="highlight" style="width:500px;" value="';
+        echo $row['highlight'];
+        echo '"/></td></tr>
+        <tr><td></td><td>Examples:<br>5 : The 5th line<br>1-5 : Lines 1 through 5<br>1,4 : Line 1 and line 4<br>1-2, 5, 9-20 : Lines 1 through 2, line 5, lines 9 through 20 </td></tr>';
+
+        echo '<tr><td>Private</td><td><input type="checkbox" name="private" value="on" ';
         if ($row['private'] == "on") {
             echo "checked";
         } echo'></td></tr>
@@ -108,6 +118,7 @@ if (($_GET["action"] == "edit")) {
     // Saving edited information to the database
     if ($_SERVER['REQUEST_METHOD'] == 'POST') {
 		$name = $_POST['name'];
+        $highlight = $_POST['highlight'];
         $language = $_POST['language'];
 		$code = $_POST['code'];
         $name = str_replace($search, $replace, $name);
@@ -115,8 +126,9 @@ if (($_GET["action"] == "edit")) {
         $code = str_replace($search, $replace, $code);
         
         $private = (isset($_POST['private']) && $_POST['private'] === "on")?"on":"off";
+        $lines = (isset($_POST['lines']) && $_POST['lines'] === "on")?"on":"off";
         $id = $_GET['id']; 
-        $query_update = "UPDATE $mytable set name='$name', code='$code', language='$language', description='$description', private='$private' where ID='$id' ";
+        $query_update = "UPDATE $mytable set name='$name', code='$code', language='$language', description='$description', private='$private', lines='$lines', highlight='$highlight' where ID='$id' ";
         $results = $base->exec($query_update);
         header("location:index.php");
     }
@@ -133,7 +145,9 @@ if (isset($_POST["add"])) {
     $description = str_replace($search, $replace, $description);
 
     $code = $_POST['code'];
-    $private = (isset($_POST['private']) && $_POST['private'] = "on")?"on":"off";
+    $private = (isset($_POST['private']) && $_POST['private'] == "on")?"on":"off";
+    $lines = (isset($_POST['lines']) && $_POST['lines'] == "on")?"on":"off";
+    $highlight = $_POST['highlight'];
     $date = date("F j, Y - H:i");
     // connect to the database
     $dbname = '../snippets.sqlite';
@@ -142,8 +156,8 @@ if (isset($_POST["add"])) {
 
     $code = iconv('UTF-8', 'ISO-8859-15', htmlspecialchars($_POST['code'], ENT_QUOTES));
     
-    $query = "INSERT INTO $mytable(language, name, description, code, private, date)
-                    VALUES ( '$language', '$name', '$description', '$code', '$private', '$date')";
+    $query = "INSERT INTO $mytable(language, name, description, code, private, lines, highlight,  date)
+                    VALUES ( '$language', '$name', '$description', '$code', '$private', '$lines','$highlight' , '$date')";
     $results = $base->exec($query);
     // returns to the main admin page
     header("location:index.php");
@@ -180,6 +194,10 @@ if (($_GET["action"] == "add")) {
                     </td></tr>
                 <tr><td>Description</td><td><textarea name="description" style="width:500px;height:100px;"></textarea></td></tr>
                 <tr><td>Code</td><td><textarea name="code" style="width:500px;height:300px;"></textarea></td></tr>
+                <tr><td>Line numbers</td><td><input type="checkbox" name="lines" value="on"></td></tr>
+                <tr><td>OR</td></tr>
+                <tr><td>Highlight lines</td><td><input type="text" name="highlight" style="width:500px;"/></td></tr>
+                <tr><td></td><td style="background-color:lightgray;"><u>Examples for lines highlighting :</u><br>5 : The 5th line<br>1-5 : Lines 1 through 5<br>1,4 : Line 1 and line 4<br>1-2, 5, 9-20 : Lines 1 through 2, line 5, lines 9 through 20</td></tr>
                 <tr><td>Private</td><td><input type="checkbox" name="private" value="on"></td></tr>
             </table>
             <input name="add" type="hidden" />

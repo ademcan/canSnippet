@@ -34,7 +34,7 @@ function isLoggedIn()
         <link href="css/prism.css" rel="stylesheet" />
         <script src="js/prism.js"></script>
         <title>
-            <?php echo $title; ?>
+            <?php echo $title; ?> prism_plugins
         </title>
     </head>
         
