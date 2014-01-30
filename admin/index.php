@@ -67,15 +67,7 @@ if (isset($_SESSION['valid']) && $_SESSION['valid']) {
         echo '<font size="1"><i>'.$language.'</i> - '.$date.'</font>';
         echo '<br><img src="../images/info.png" style="vertical-align: middle;"/>';
         echo '&nbsp;&nbsp;'.nl2br($description);
-        if ($lines=="on"){
-            echo '<section class="'.$languageClass.'"> <pre class="line-numbers"><code>'.$code.'</code></pre> </section>';
-        }
-        else if ($highlight!=""){
-            echo '<section class="'.$languageClass.'"> <pre data-line='.$highlight.'><code>'.$code.'</code></pre> </section>';   
-        }
-        else {
-            echo '<section class="'.$languageClass.'"> <pre><code>'.$code.'</code></pre> </section>' ;
-        }
+        echo '<section class="'.$languageClass.'"> <pre class="'.(($lines=="on")?"line-numbers":"").'"'.(($highlight!="")?" data-line=\"$highlight\"":"").'><code>'.$code.'</code></pre> </section>';
         echo '<a href="action.php?action=edit&id=' . $row['ID'] . '" class="editButton">Edit</a>';
         echo '<a href="action.php?action=delete&id=' . $row['ID'] . '" onclick="return confirm(\'Do you really want to delete this snippet ?\');" class="deleteButton">Delete</a>';
         echo '<hr><br>';
