@@ -116,13 +116,14 @@ if (file_exists($config["dbname"])) {
                 ID INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,
                 username longtext,
                 title longtext,
-                theme longtext
+                theme longtext,
+                prismtheme longtext
                 )";
             $base->exec($createSettingsDatabase);
 
             // Add default settings to database  
-            $addDefaultSettings = "INSERT INTO settings(username, title, theme)
-                VALUES ('$username' , '$title', 'flat')";
+            $addDefaultSettings = "INSERT INTO settings(username, title, theme, prismtheme)
+                VALUES ('$username' , '$title', 'flat', '".$config["defaultPrismCSS"]."')";
             $base->exec($addDefaultSettings);
             
             ?>
