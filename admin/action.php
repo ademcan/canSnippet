@@ -24,7 +24,7 @@ if(!isset($_GET["action"]))
 // Delete a snippet based on its identifier
 if (($_GET["action"] == "delete")) {
     // connection to the database
-    "../".$config['dbname'] = '../snippets.sqlite';
+    // "../".$config['dbname'] = '../snippets.sqlite';
     $mytable = "snippets";
     $base = new SQLite3("../".$config['dbname']);
     // sql command to delete the snippet
@@ -36,7 +36,6 @@ if (($_GET["action"] == "delete")) {
 
 // Edit a snippet based on its identifier
 if (($_GET["action"] == "edit")) {
-    "../".$config['dbname'] = '../snippets.sqlite';
     $mytable = "snippets";
     $base = new SQLite3("../".$config['dbname']);
     $query_name = "SELECT * FROM $mytable WHERE ID=" . $_GET["id"] . " ";
@@ -150,7 +149,6 @@ if (isset($_POST["add"])) {
     $highlight = $_POST['highlight'];
     $date = date("F j, Y - H:i");
     // connect to the database
-    "../".$config['dbname'] = '../snippets.sqlite';
     $mytable = "snippets";
     $base = new SQLite3("../".$config['dbname']);
 
@@ -211,42 +209,7 @@ if (($_GET["action"] == "add")) {
     <?php
 }
 
-// Save the new css_prism theme
-if (isset($_POST["prism_theme"])) {
-	$base = new SQLite3("../".$config['dbname']);
-	$query = "UPDATE settings set prismtheme='".$_POST['prism_theme']."' ";
-    $base->exec($query);
-    // returns to the main admin page
-    header("location:index.php");
-}
 
-// Page for adding new snippet
-if (($_GET["action"] == "prism_theme")) {
-    include 'admin-menu.php';
-    ?>
-
-    <h1>Add a new snippet</h1>
-
-    <div id="newSnippet">
-
-        <form id="form" name="prism_theme" method="post" action="action.php">
-            <select name="prism_theme">
-            	<option value="<?=$config["defaultPrismCSS"]?>">Default</option>
-            	<?php
-            	$files = scandir("../".dirname($config["defaultPrismCSS"]).'/prism_theme/');
-            	for ($i=0;$i<count($files);$i++)
-					if(preg_match("/.+\.css/",$files[$i]))
-						echo '<option value="'.dirname($config["defaultPrismCSS"]).'/prism_theme/'.$files[$i].'">'.$files[$i].'</option>';
-            	?>
-            </select>
-	        <input class="loginButton" type="submit" value="Change CSS" class="submit"/>
-        </form>
-    </div>
-    </div>
-    </body>
-    </html>
-    <?php
-}
 
 // Preferences page with general options
 if (($_GET["action"] == "preferences")) {
@@ -260,6 +223,24 @@ if (($_GET["action"] == "preferences")) {
     <h1>Preferences</h1>
     <div id="newSnippet">
 
+    <h2>Change prism theme</h2>
+    <br>
+        <form id="form" name="prism_theme" method="post" >
+            <select name="prism_theme">
+                <option value="<?=$config["defaultPrismCSS"]?>">Default</option>
+                <?php
+                $files = scandir("../".dirname($config["defaultPrismCSS"]).'/prism_theme/');
+                for ($i=0;$i<count($files);$i++)
+                    if(preg_match("/.+\.css/",$files[$i]))
+                        echo '<option value="'.dirname($config["defaultPrismCSS"]).'/prism_theme/'.$files[$i].'">'.$files[$i].'</option>';
+                ?>
+            </select>
+            <br>
+            <input class="loginButton" type="submit" value="Change CSS" class="submit" />
+        </form>
+        <br>
+    <hr>
+    
     <?php
     // get user pasword information
     $query_pwd = "SELECT * FROM user ";
@@ -286,11 +267,19 @@ if (($_GET["action"] == "preferences")) {
     // Update the new settings
     if ($_SERVER['REQUEST_METHOD'] == 'POST') {
 
-        if (isset($_POST['theme'])) {
-            $theme = $_POST['theme'];
-            $queryUpdateSettings = "UPDATE settings set theme= '$theme' ";
-            $base->exec($queryUpdateSettings);
-            echo "<script>location.href='action.php?action=preferences';</script>";
+        // if (isset($_POST['theme'])) {
+        //     $theme = $_POST['theme'];
+        //     $queryUpdateSettings = "UPDATE settings set theme= '$theme' ";
+        //     $base->exec($queryUpdateSettings);
+        //     echo "<script>location.href='action.php?action=preferences';</script>";
+        // }
+
+        if (isset($_POST["prism_theme"])) {
+            // $base = new SQLite3("../".$config['dbname']);
+            $query = "UPDATE settings set prismtheme='".$_POST['prism_theme']."' ";
+            $base->exec($query);
+            // returns to the main admin page
+            header("location:index.php");
         }
 
         if (isset($_POST['password1']) && isset($_POST['password2']) && $_POST['password1'] == $_POST['password2']) {

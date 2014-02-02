@@ -42,7 +42,6 @@ else {
             <a href="index.php" class="button"> My snippets </a>
             <a href="action.php?action=add" class="button"> New snippet </a>
             <a href="action.php?action=preferences" class="button"> Preferences </a>
-            <a href="action.php?action=prism_theme" class="button"> Select Prism theme </a>
             <hr>
             <a href="../index.php" class="button"> Back to canSnippet </a>
             <a href="../logout.php" class="logoutButton"> Logout </a>
