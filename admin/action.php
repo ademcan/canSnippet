@@ -100,7 +100,7 @@ if (($_GET["action"] == "edit")) {
             echo "checked";
         } echo'></td></tr>';
 
-        echo '<tr><td>Highlight lines</td><td><input type="text" name="highlight" style="width:500px;" value="';
+        echo '<tr><td>Highlight lines</td><td><input type="text" name="highlight" pattern="^(?:(?:(?:[0-9]+(?:-[0-9]+)?),)*(?:[0-9]+(?:-[0-9]+)?))?$" style="width:500px;" value="';
         echo $row['highlight'];
         echo '"/></td></tr>
         <tr><td></td><td>Examples:<br>5 : The 5th line<br>1-5 : Lines 1 through 5<br>1,4 : Line 1 and line 4<br>1-2, 5, 9-20 : Lines 1 through 2, line 5, lines 9 through 20 </td></tr>';
@@ -194,7 +194,7 @@ if (($_GET["action"] == "add")) {
                 <tr><td>Code</td><td><textarea name="code" style="width:500px;height:300px;"></textarea></td></tr>
                 <tr><td>Line numbers</td><td><input type="checkbox" name="lines" value="on"></td></tr>
                 <tr><td>OR</td></tr>
-                <tr><td>Highlight lines</td><td><input type="text" name="highlight" style="width:500px;"/></td></tr>
+                <tr><td>Highlight lines</td><td><input type="text" name="highlight" pattern="^(?:(?:(?:[0-9]+(?:-[0-9]+)?),)*(?:[0-9]+(?:-[0-9]+)?))?$" style="width:500px;"/></td></tr>
                 <tr><td></td><td style="background-color:lightgray;"><u>Examples for lines highlighting :</u><br>5 : The 5th line<br>1-5 : Lines 1 through 5<br>1,4 : Line 1 and line 4<br>1-2, 5, 9-20 : Lines 1 through 2, line 5, lines 9 through 20</td></tr>
                 <tr><td>Private</td><td><input type="checkbox" name="private" value="on"></td></tr>
             </table>
