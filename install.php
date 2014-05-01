@@ -104,7 +104,7 @@ if (file_exists($config["dbname"])) {
                 description longtext,
                 name longtext,
                 code longtext,
-                date date,
+                date text,
                 private integer
                 )";
             $base->exec($createSnippetsDatabase);

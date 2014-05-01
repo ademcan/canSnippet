@@ -134,7 +134,7 @@ if (isset($_POST["add"])) {
 
     $code = $_POST['code'];
     $private = (isset($_POST['private']) && $_POST['private'] = "on")?"on":"off";
-    $date = date("F j, Y - H:i");
+    $date = date("Y-m-d H:i:s");
     // connect to the database
     $dbname = '../snippets.sqlite';
     $mytable = "snippets";
