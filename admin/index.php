@@ -26,7 +26,7 @@ if (isset($_SESSION['valid']) && $_SESSION['valid']) {
     }
     $start_count = $limit * ($page - 1);
 
-    $query_name = "SELECT * FROM $mytable ORDER BY date DESC LIMIT $start_count,$limit";
+    $query_name = "SELECT * FROM $mytable ORDER BY ID DESC LIMIT $start_count,$limit";
     $results_name = $base->query($query_name);
 
     echo '<h1>My snippets</h1><div id="newSnippet">';

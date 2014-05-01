@@ -32,11 +32,11 @@
     
     // if logged in, the user can see the private snippets
     if(isset($_SESSION['valid']) && $_SESSION['valid']){
-        $query_name = "SELECT * FROM $mytable ORDER BY date DESC LIMIT $start_count,$limit";
+        $query_name = "SELECT * FROM $mytable ORDER BY ID DESC LIMIT $start_count,$limit";
     }
     // if not logged in, select only public snippets
     else {
-        $query_name = "SELECT * FROM $mytable WHERE private != 'on' ORDER BY date DESC LIMIT $start_count,$limit";
+        $query_name = "SELECT * FROM $mytable WHERE private != 'on' ORDER BY ID DESC LIMIT $start_count,$limit";
     }
     $results_name = $base->query($query_name);
     
