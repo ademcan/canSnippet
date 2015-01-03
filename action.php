@@ -10,10 +10,11 @@
     $mytable ="snippets";
     $base=new SQLite3($config["dbname"]);
 
-    if(isset($_POST["action"]) && $_POST['action']=="getcode"){
-        $id = $_POST["id"];
+    if(isset($_POST["action"]) && strval($_POST['action'])=="getcode"){
+        $id = intval($_POST["id"]);
         // get entry
         $query_language = "SELECT * FROM $mytable where id = '$id' ";
+
         $results_language = $base->query($query_language);
         while($row = $results_language->fetchArray())
         {

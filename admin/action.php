@@ -13,7 +13,7 @@ if (!isset($_SESSION['valid']) || !$_SESSION['valid']) {
     header("location:login.php");
 }
 else {
-    
+
 ob_start();
 setlocale(LC_CTYPE, 'fr_FR.UTF-8');
 
@@ -28,7 +28,7 @@ if (($_GET["action"] == "delete")) {
     $mytable = "snippets";
     $base = new SQLite3($dbname);
     // sql command to delete the snippet
-    $query_name = "DELETE FROM $mytable WHERE ID=" . $_GET["id"] . "";
+    $query_name = "DELETE FROM $mytable WHERE ID=" . intval($_GET["id"]) . " ";
     $results_name = $base->query($query_name);
     // returns to the main admin page
     header("location:index.php");
@@ -39,7 +39,7 @@ if (($_GET["action"] == "edit")) {
     $dbname = '../snippets.sqlite';
     $mytable = "snippets";
     $base = new SQLite3($dbname);
-    $query_name = "SELECT * FROM $mytable WHERE ID=" . $_GET["id"] . " ";
+    $query_name = "SELECT * FROM $mytable WHERE ID=" . intval($_GET["id"]) . " ";
     $results_name = $base->query($query_name);
     // Edit page
     include 'admin-menu.php';
@@ -85,14 +85,14 @@ if (($_GET["action"] == "edit")) {
             echo 'selected'; echo' value="java">java</option>
         <option ';
         if ($row['language'] == 'php')
-            echo 'selected'; echo' value="php">php</option>    
-            
+            echo 'selected'; echo' value="php">php</option>
+
                 </select>
                 </td></tr>
                 <tr><td>Description</td><td><textarea name="description" style="width:500px;height:100px;">';
         echo $row['description'];
         echo '</textarea></td></tr>
-        
+
             <tr><td>Code</td><td><textarea name="code" style="width:500px;height:300px;">';
         echo $row['code'];
         echo '</textarea></td></tr>
@@ -107,15 +107,15 @@ if (($_GET["action"] == "edit")) {
     }
     // Saving edited information to the database
     if ($_SERVER['REQUEST_METHOD'] == 'POST') {
-		$name = $_POST['name'];
-        $language = $_POST['language'];
-		$code = $_POST['code'];
+        $name = SQLite3::escapeString(trim(strval($_POST['name'])));
+        $language = SQLite3::escapeString(trim(strval($_POST['language'])));
+        $code = SQLite3::escapeString(trim(strval($_POST['code'])));
         $name = str_replace($search, $replace, $name);
-        $description = str_replace($search, $replace, $_POST['description']);
+        $description = str_replace($search, $replace, SQLite3::escapeString(trim(strval($_POST['description']))));
         $code = str_replace($search, $replace, $code);
-        
+
         $private = (isset($_POST['private']) && $_POST['private'] === "on")?"on":"off";
-        $id = $_GET['id']; 
+        $id = $_GET['id'];
         $query_update = "UPDATE $mytable set name='$name', code='$code', language='$language', description='$description', private='$private' where ID='$id' ";
         $results = $base->exec($query_update);
         header("location:index.php");
@@ -125,9 +125,9 @@ if (($_GET["action"] == "edit")) {
 // Save new snippet to the database
 if (isset($_POST["add"])) {
     // get values
-    $language = $_POST['language'];
-    $name = iconv('UTF-8', 'ISO-8859-15', $_POST['name']);
-    $description = iconv('UTF-8', 'ISO-8859-15', $_POST['description']);
+    $language = SQLite3::escapeString(trim(strval($_POST['language'])));
+    $name = iconv('UTF-8', 'ISO-8859-15', SQLite3::escapeString(trim(strval($_POST['name']))));
+    $description = iconv('UTF-8', 'ISO-8859-15', SQLite3::escapeString(trim(strval($_POST['description']))));
 
     $name = str_replace($search, $replace, $name);
     $description = str_replace($search, $replace, $description);
@@ -141,7 +141,7 @@ if (isset($_POST["add"])) {
     $base = new SQLite3($dbname);
 
     $code = iconv('UTF-8', 'ISO-8859-15', htmlspecialchars($_POST['code'], ENT_QUOTES));
-    
+
     $query = "INSERT INTO $mytable(language, name, description, code, private, date)
                     VALUES ( '$language', '$name', '$description', '$code', '$private', '$date')";
     $results = $base->exec($query);
@@ -214,7 +214,7 @@ if (($_GET["action"] == "preferences")) {
         <br>
         <h2>Change password</h2>
 
-        <form id="form-pwd" name="settings2" method="post" >  
+        <form id="form-pwd" name="settings2" method="post" >
             <br>
             <table>
                 <tr><td width="200px">
@@ -232,7 +232,7 @@ if (($_GET["action"] == "preferences")) {
     if ($_SERVER['REQUEST_METHOD'] == 'POST') {
 
         if (isset($_POST['theme'])) {
-            $theme = $_POST['theme'];
+            $theme = SQLite3::escapeString(trim(strval($_POST['theme'])));
             $queryUpdateSettings = "UPDATE settings set theme= '$theme' ";
             $base->exec($queryUpdateSettings);
             echo "<script>location.href='action.php?action=preferences';</script>";

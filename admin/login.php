@@ -29,8 +29,8 @@ session_start();
 
 <?php
 
-// Checking all login information 
-if($_SERVER['REQUEST_METHOD'] == 'POST'){    
+// Checking all login information
+if($_SERVER['REQUEST_METHOD'] == 'POST'){
     // Create users table
     $dbname='../snippets.sqlite';
     $mytable ="user";
@@ -40,25 +40,24 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
 
     $base=new SQLite3($dbname);
 
-    $username = $_POST['username'];
-    $password = $_POST['password'];
-    //connect to the database here
-    $username = SQLite3::escapeString($username);
+    $username = SQLite3::escapeString(trim(strval($_POST['username'])));
+    $password = SQLite3::escapeString(trim(strval($_POST['password'])));
+
     $query = "SELECT password, salt
             FROM user
             WHERE username = '$username';";
     $result = $base-> query($query);
-    
+
     if( !$result ) //no such user exists
     {
         header('Location: index.php');
     }
-    
+
     $userData = $result->fetchArray();
     $hash = hash('sha256', $userData['salt'] . hash('sha256', $password) );
-    
+
     // incorrect password
-    if($hash != $userData['password']) 
+    if($hash != $userData['password'])
     {
         ?>
             <script>
@@ -77,6 +76,6 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
                 location.href = '../index.php';
             </script>
         <?php
-    }   
+    }
 }
 ?>

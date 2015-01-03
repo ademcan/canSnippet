@@ -32,7 +32,7 @@ if (file_exists($config["dbname"])) {
                 <tr><td>Password Again :</td><td> <input type="password" name="pass2" /></td></tr>
                 </table>
                 </center>
-                
+
                 <?php
                 if(is_writable(dirname($config["dbname"])))
                 {
@@ -46,8 +46,8 @@ if (file_exists($config["dbname"])) {
                 }
                 ?>
 
-            </form>  
-            
+            </form>
+
         </div>
 
         <?php
@@ -69,9 +69,9 @@ if (file_exists($config["dbname"])) {
             $results = $base->exec($query);
 
             //retrieve our data from POST
-            $username = $_POST['username'];
-            $pass1 = $_POST['pass1'];
-            $pass2 = $_POST['pass2'];
+            $username = SQLite3::escapeString(trim(strval($_POST['username'])));
+            $pass1 = trim(strval($_POST['pass1']));
+            $pass2 = trim(strval($_POST['pass2']));
             // check if both passwords are identical
             if ($pass1 != $pass2)
                 header('Location: install.php');
@@ -91,7 +91,7 @@ if (file_exists($config["dbname"])) {
 
             // special characters protection
             $title = htmlentities($_POST['title'],ENT_QUOTES);
-            
+
             // Add the user to the database
             $addUser = "INSERT INTO user(username, password, salt)
                 VALUES ('$username' , '$hash' ,'$salt')";
@@ -104,7 +104,7 @@ if (file_exists($config["dbname"])) {
                 description longtext,
                 name longtext,
                 code longtext,
-                date text,
+                date date,
                 private integer
                 )";
             $base->exec($createSnippetsDatabase);
@@ -118,11 +118,11 @@ if (file_exists($config["dbname"])) {
                 )";
             $base->exec($createSettingsDatabase);
 
-            // Add default settings to database  
+            // Add default settings to database
             $addDefaultSettings = "INSERT INTO settings(username, title, theme)
                 VALUES ('$username' , '$title', 'flat')";
             $base->exec($addDefaultSettings);
-            
+
             ?>
             <script>
                 location.href = 'index.php';
