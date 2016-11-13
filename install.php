@@ -32,7 +32,7 @@ if (file_exists($config["dbname"])) {
                 <tr><td>Password Again :</td><td> <input type="password" name="pass2" /></td></tr>
                 </table>
                 </center>
-                
+
                 <?php
                 if(is_writable(dirname($config["dbname"])))
                 {
@@ -46,8 +46,8 @@ if (file_exists($config["dbname"])) {
                 }
                 ?>
 
-            </form>  
-            
+            </form>
+
         </div>
 
         <?php
@@ -61,10 +61,10 @@ if (file_exists($config["dbname"])) {
             $base = new SQLite3($config["dbname"]);
 
             $query = "CREATE TABLE user(
-                    username VARCHAR(30) NOT NULL UNIQUE,
+                    username VARCHAR(30) NOT NULL PRIMARY KEY UNIQUE,
+                    status longtext,
                     password VARCHAR(64) NOT NULL,
-                    salt VARCHAR(3) NOT NULL,
-                    PRIMARY KEY(username)
+                    salt VARCHAR(3) NOT NULL
                 )";
             $results = $base->exec($query);
 
@@ -91,15 +91,17 @@ if (file_exists($config["dbname"])) {
 
             // special characters protection
             $title = htmlentities($_POST['title'],ENT_QUOTES);
-            
+
             // Add the user to the database
-            $addUser = "INSERT INTO user(username, password, salt)
-                VALUES ('$username' , '$hash' ,'$salt')";
+            $status = "admin";
+            $addUser = "INSERT INTO user(username, status, password, salt)
+                VALUES ('$username', '$status' , '$hash' ,'$salt')";
             $base->exec($addUser);
 
             // Create snippets table
             $createSnippetsDatabase = "CREATE TABLE snippets(
                 ID INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,
+                username longtext,
                 language longtext,
                 description longtext,
                 name longtext,
@@ -121,11 +123,11 @@ if (file_exists($config["dbname"])) {
                 )";
             $base->exec($createSettingsDatabase);
 
-            // Add default settings to database  
+            // Add default settings to database
             $addDefaultSettings = "INSERT INTO settings(username, title, theme, prismtheme)
                 VALUES ('$username' , '$title', 'flat', '".$config["defaultPrismCSS"]."')";
             $base->exec($addDefaultSettings);
-            
+
             ?>
             <script>
                 location.href = 'index.php';

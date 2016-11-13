@@ -4,6 +4,11 @@
   @name: action.php
   @description: action class for admin panel
 */
+
+
+ini_set('display_errors', 'On');
+error_reporting(E_ALL);
+
 require_once('../config.php');
 if (!isset($_SESSION))
     session_start();
@@ -13,7 +18,7 @@ if (!isset($_SESSION['valid']) || !$_SESSION['valid']) {
     header("location:login.php");
 }
 else {
-    
+
 ob_start();
 setlocale(LC_CTYPE, 'fr_FR.UTF-8');
 
@@ -84,14 +89,14 @@ if (($_GET["action"] == "edit")) {
             echo 'selected'; echo' value="java">java</option>
         <option ';
         if ($row['language'] == 'php')
-            echo 'selected'; echo' value="php">php</option>    
-            
+            echo 'selected'; echo' value="php">php</option>
+
                 </select>
                 </td></tr>
                 <tr><td>Description</td><td><textarea name="description" style="width:500px;height:100px;">';
         echo $row['description'];
         echo '</textarea></td></tr>
-        
+
             <tr><td>Code</td><td><textarea name="code" style="width:500px;height:300px;">';
         echo $row['code'];
         echo '</textarea></td></tr>';
@@ -123,10 +128,10 @@ if (($_GET["action"] == "edit")) {
         $name = str_replace($search, $replace, $name);
         $description = str_replace($search, $replace, $_POST['description']);
         $code = str_replace($search, $replace, $code);
-        
+
         $private = (isset($_POST['private']) && $_POST['private'] === "on")?"on":"off";
         $lines = (isset($_POST['lines']) && $_POST['lines'] === "on")?"on":"off";
-        $id = $_GET['id']; 
+        $id = $_GET['id'];
         $query_update = "UPDATE $mytable set name='$name', code='$code', language='$language', description='$description', private='$private', lines='$lines', highlight='$highlight' where ID='$id' ";
         $results = $base->exec($query_update);
         header("location:index.php");
@@ -153,9 +158,10 @@ if (isset($_POST["add"])) {
     $base = new SQLite3("../".$config['dbname']);
 
     $code = iconv('UTF-8', 'ISO-8859-15', htmlspecialchars($_POST['code'], ENT_QUOTES));
-    
-    $query = "INSERT INTO $mytable(language, name, description, code, private, lines, highlight,  date)
-                    VALUES ( '$language', '$name', '$description', '$code', '$private', '$lines','$highlight' , '$date')";
+
+    $username = $_SESSION['username'];
+    $query = "INSERT INTO $mytable(username, language, name, description, code, private, lines, highlight,  date)
+                    VALUES ('$username', '$language', '$name', '$description', '$code', '$private', '$lines','$highlight' , '$date')";
     $results = $base->exec($query);
     // returns to the main admin page
     header("location:index.php");
@@ -211,6 +217,165 @@ if (($_GET["action"] == "add")) {
 
 
 
+
+
+
+
+
+
+
+
+
+
+// Page for users configuration
+if (($_GET["action"] == "users")) {
+
+        include 'admin-menu.php';
+        $dbname = '../snippets.sqlite';
+        $mytable = "user";
+        $base = new SQLite3($dbname);
+
+        $count_query = "SELECT count(*) as count FROM $mytable";
+        $results_count = $base->query($count_query);
+        $row_count = $results_count->fetchArray();
+        $snippets_count = $row_count['count'];
+        $limit = 10;
+        $page = 1;
+
+        if (isset($_GET['page'])) {
+            $page = $_GET['page'];
+        }
+        $start_count = $limit * ($page - 1);
+
+        $query_name = "SELECT * FROM $mytable ";
+        $results_name = $base->query($query_name);
+
+        echo '<h1>Registered users</h1><div id="newSnippet">';
+
+        echo '<table>';
+        // Loop and write all the recent snippets
+        while($row = $results_name->fetchArray())
+        {
+            $name = $row['username'];
+            $status = $row['status'];
+
+            echo '<tr>';
+            echo '<td>'.$name.'</td><td>'.$status.'</td><td>';
+            echo '<a href="action.php?action=edituser&id=' . $name . '" class="editButton">Edit</a>';
+            echo '<a href="action.php?action=deleteuser&id=' . $name . '" onclick="return confirm(\'Do you really want to delete this snippet ?\');" class="deleteButton">Delete</a></td></tr>';
+
+        }
+        echo "</table><br><br>";
+        echo '<a href="action.php?action=adduser" class="addButton">Add new user</a>';
+
+        // Pagination
+        // First page
+        if ($snippets_count > $limit & $page == 1) {
+            echo '<center><a href= "index.php?page=2"> Older snippets >>> </a></center>';
+        }
+        // Last page
+        if ($page > 1 & $snippets_count <= ($limit * $page) & $snippets_count > ($limit * ($page - 1))) {
+            echo '<center><a href= "index.php?page=' . ($page - 1) . '"> <<< Newer snippets </a></center>';
+        }
+        // Middle page
+        if ($page > 1 & $snippets_count > ($limit * $page)) {
+            echo '<center><a href= "index.php?page=' . ($page - 1) . '"> <<< Newer snippets</a> -- <a href="index.php?page=' . ($page + 1) . '">Older snippets >>></a></center>';
+        }
+        ?>
+
+        </center><br><br></div></body></html>
+
+    </div>
+    </div>
+    </body>
+    </html>
+    <?php
+}
+
+
+
+
+
+
+// Page for adding new snippet
+if (($_GET["action"] == "adduser")) {
+    include 'admin-menu.php';
+    ?>
+
+    <h1>Add a new user</h1>
+
+    <div id="newSnippet">
+
+        <form action="action.php" method="post">
+            <table>
+            <tr><td width="150px">Username :</td><td> <input type="text" name="username" maxlength="30" /></td></tr>
+            <tr><td> Role </td><td>
+            <select id="status" name="status">
+                <option value="admin">admin</option>
+                <option value="noadmin">no-admin</option>
+            </select>
+            </td></tr>
+            <tr><td>Password :</td><td> <input type="text" name="pass1" /></td></tr>
+            </table>
+            </center>
+            <input name="adduser" type="hidden" />
+            <input type="submit" value="Add user" class="installButton"/>
+        </form>
+
+
+    </div>
+    </div>
+    </body>
+    </html>
+    <?php
+}
+
+
+// Save new user to the database
+if (isset($_POST["adduser"])) {
+
+    $dbname = '../snippets.sqlite';
+    $base = new SQLite3($dbname);
+
+    // get values
+    $username = $_POST['username'];
+    $pwd = $_POST['pass1'];
+    $status = $_POST['status'];
+
+    $hash = hash('sha256', $pwd);
+    //creates a 3 character sequence for salt
+    function createSalt() {
+        $string = md5(uniqid(rand(), true));
+        return substr($string, 0, 3);
+    }
+
+    $salt = createSalt();
+    $hash = hash('sha256', $salt . $hash);
+
+
+    // Add the user to the database
+    $addUser = "INSERT INTO user(username, status, password, salt)
+        VALUES ('$username', '$status' , '$hash' ,'$salt')";
+    $base->exec($addUser);
+
+    // returns to the main admin page
+    header("location:index.php");
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 // Preferences page with general options
 if (($_GET["action"] == "preferences")) {
 
@@ -240,7 +405,7 @@ if (($_GET["action"] == "preferences")) {
         </form>
         <br>
     <hr>
-    
+
     <?php
     // get user pasword information
     $query_pwd = "SELECT * FROM user ";
@@ -250,7 +415,7 @@ if (($_GET["action"] == "preferences")) {
         <br>
         <h2>Change password</h2>
 
-        <form id="form-pwd" name="settings2" method="post" >  
+        <form id="form-pwd" name="settings2" method="post" >
             <br>
             <table>
                 <tr><td width="200px">

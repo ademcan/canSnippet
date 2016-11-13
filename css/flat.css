@@ -72,7 +72,7 @@ div#codePanel{
 
 div#loginWindow{
     width:300px;
-    margin:  100px auto;    
+    margin:  100px auto;
     padding: 20px 20px ;
     border: solid 3px;
     border-color: #2ecc71;
@@ -82,7 +82,7 @@ div#loginWindow{
 div#installWindow{
     width:400px;
     text-align: center;
-    margin:  100px auto;    
+    margin:  100px auto;
     padding: 20px 20px ;
     border: solid 3px;
     border-color: #2ecc71;
@@ -90,7 +90,7 @@ div#installWindow{
 
 div#newSnippet{
     width: 80%;
-    margin:  30px 20px;    
+    margin:  30px 20px;
     padding: 20px 20px ;
     border: solid 3px;
     border-color: #2ecc71;
@@ -175,6 +175,19 @@ a.editButton:hover{
     background-color: #2980b9;
 }
 
+
+a.addButton{
+    display: inline-block;
+    width: 100px;
+    height: 20px;
+    box-shadow: none;
+    border-style: none;
+    background-color: green;
+    color: white;
+    padding-top: 4px;
+    text-align: center;
+}
+
 a.button{
     display: inline-block;
     padding-top: 40px;
@@ -224,7 +237,7 @@ a.button:hover{
 }
 
 hr{
-    width:95%; 
+    width:95%;
     height:5px;
     background-color:#2ecc71;
     /*border-radius:20px;*/
@@ -253,7 +266,7 @@ hr{
         padding-top: 20px;
         min-height:100px;
     }
-    
+
     div#languagePanel{
         width:100%;
     }

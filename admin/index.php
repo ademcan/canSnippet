@@ -20,24 +20,47 @@ if (isset($_SESSION['valid']) && $_SESSION['valid']) {
     $snippets_count = $row_count['count'];
     $limit = 10;
     $page = 1;
-    
+
     if (isset($_GET['page'])) {
         $page = $_GET['page'];
     }
     $start_count = $limit * ($page - 1);
 
-    $query_name = "SELECT * FROM $mytable ORDER BY date DESC LIMIT $start_count,$limit";
+    $username = $_SESSION['username'];
+
+
+    $queryU = "SELECT * FROM user WHERE username=\"".$username."\" ";
+    $resultsU = $base->query($queryU);
+    $rowU = $resultsU->fetchArray();
+    $status = $rowU["status"];
+
+
+    if ($status == "admin"){
+        // If admin, show all the snippets
+        $query_name = "SELECT * FROM $mytable ORDER BY date DESC LIMIT $start_count,$limit";
+        $title = "All snippets";
+    }
+    else {
+        // If not admin show only user's snippets
+        $query_name = "SELECT * FROM $mytable WHERE username=\"".$username."\" ORDER BY date DESC LIMIT $start_count,$limit";
+        $title = "My snippets";
+    }
+
+
+
+
     $results_name = $base->query($query_name);
 
-    echo '<h1>My snippets</h1><div id="newSnippet">';
+    echo '<h1>'.$title.'</h1><div id="newSnippet">';
 
     if ($snippets_count == 0){
         echo "You don't have any snippet yet, you can add new snippets from 'New snippet' menu.";
     }
-    
+
     // Loop and write all the recent snippets
     while($row = $results_name->fetchArray())
     {
+        $username = $row['username'];
         $name = $row['name'];
         $code = $row['code'];
         $language = $row['language'];
@@ -53,7 +76,7 @@ if (isset($_SESSION['valid']) && $_SESSION['valid']) {
         else{
             echo '<h2><font color="#27ae60">'.$name.'</font></h2>';
         }
-        
+
         if ($language=="html"){
             $languageClass = "language-markup";
         }
@@ -63,8 +86,13 @@ if (isset($_SESSION['valid']) && $_SESSION['valid']) {
         else{
             $languageClass = "language-".$language;
         }
-        
-        echo '<font size="1"><i>'.$language.'</i> - '.$date.'</font>';
+
+        // If admin is connected, show the snippet's creator
+        if ($status == "admin"){
+            echo '<font size="4">Author: <b>'.$username.'</b><br>';
+        }
+
+        echo '<font size="4"><i>'.$language.'</i> - '.$date.'</font>';
         echo '<br><img src="../images/info.png" style="vertical-align: middle;"/>';
         echo '&nbsp;&nbsp;'.nl2br($description);
         echo '<section class="'.$languageClass.'"> <pre class="'.(($lines=="on")?"line-numbers":"").'"'.(($highlight!="")?" data-line=\"$highlight\"":"").'><code>'.$code.'</code></pre> </section>';
@@ -72,9 +100,9 @@ if (isset($_SESSION['valid']) && $_SESSION['valid']) {
         echo '<a href="action.php?action=delete&id=' . $row['ID'] . '" onclick="return confirm(\'Do you really want to delete this snippet ?\');" class="deleteButton">Delete</a>';
         echo '<hr><br>';
     }
- 
+
     echo "<br><br>";
-          
+
     // Pagination
     // First page
     if ($snippets_count > $limit & $page == 1) {
@@ -97,4 +125,3 @@ if (isset($_SESSION['valid']) && $_SESSION['valid']) {
             header("location:login.php");
         }
         ?>
-

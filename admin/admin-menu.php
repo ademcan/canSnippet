@@ -5,6 +5,9 @@
   @description: menu for the admin panel
  */
 
+ ini_set('display_errors', 'On');
+ error_reporting(E_ALL);
+
 if (!isset($_SESSION))
     session_start();
 
@@ -22,6 +25,16 @@ else {
         <?php
         $dbname = '../snippets.sqlite';
         $base = new SQLite3($dbname);
+
+        $username = $_SESSION['username'];
+        $queryU = "SELECT * FROM user WHERE username=\"".$username."\" ";
+        $resultsU = $base->query($queryU);
+        $rowU = $resultsU->fetchArray();
+        $status = $rowU["status"];
+
+        // $dbname = '../snippets.sqlite';
+        // $base = new SQLite3($dbname);
+
         $queryT = "SELECT * FROM settings ";
         $resultsT = $base->query($queryT);
         $rowT = $resultsT->fetchArray();
@@ -39,8 +52,17 @@ else {
 
     <body>
         <div id="menu">
+            <?php echo 'Logged in as <b>'.$username.'</b><br>Status: <b>'.$status.'</b>'; ?>
             <a href="index.php" class="button"> My snippets </a>
             <a href="action.php?action=add" class="button"> New snippet </a>
+
+            <?php
+
+            if ($status == "admin"){
+                echo '<a href="action.php?action=users" class="button"> Users </a>';
+            }
+            ?>
+
             <a href="action.php?action=preferences" class="button"> Preferences </a>
             <hr>
             <a href="../index.php" class="button"> Back to canSnippet </a>
