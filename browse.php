@@ -50,6 +50,8 @@ document.getElementById("selectLanguage").onchange = function(){
     };
     xhr.open("POST", "action.php", true);
     xhr.setRequestHeader("Content-Type", "application/x-www-form-urlencoded");
+    if(selectedLanguage=="c++")
+        selectedLanguage="c%2b%2b";
     xhr.send("language="+selectedLanguage+"&action=getname");
 };
 </script>  
