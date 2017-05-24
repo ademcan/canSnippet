@@ -5,6 +5,9 @@
   @description: index page for the admin panel
  */
 
+ ini_set('display_errors', 'On');
+ error_reporting(E_ALL);
+
 session_start();
 
 if (isset($_SESSION['valid']) && $_SESSION['valid']) {
@@ -95,7 +98,7 @@ if (isset($_SESSION['valid']) && $_SESSION['valid']) {
         echo '<font size="4"><i>'.$language.'</i> - '.$date.'</font>';
         echo '<br><img src="../images/info.png" style="vertical-align: middle;"/>';
         echo '&nbsp;&nbsp;'.nl2br($description);
-        echo '<section class="'.$languageClass.'"> <pre class="'.(($lines=="on")?"line-numbers":"").'"'.(($highlight!="")?" data-line=\"$highlight\"":"").'><code>'.$code.'</code></pre> </section>';
+        echo '<section class="'.$languageClass.'"> <pre class="line-numbers"><code>'.$code.'</code></pre> </section>';
         echo '<a href="action.php?action=edit&id=' . $row['ID'] . '" class="editButton">Edit</a>';
         echo '<a href="action.php?action=delete&id=' . $row['ID'] . '" onclick="return confirm(\'Do you really want to delete this snippet ?\');" class="deleteButton">Delete</a>';
         echo '<hr><br>';

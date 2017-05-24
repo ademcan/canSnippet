@@ -28,6 +28,7 @@ if (file_exists($config["dbname"])) {
                 <table>
                 <tr><td width="150px">Title :</td><td> <input type="text" name="title" /></td></tr>
                 <tr><td>Username :</td><td> <input type="text" name="username" maxlength="30" /></td></tr>
+                <tr><td>Email :</td><td> <input type="email" name="email" maxlength="30" /></td></tr>
                 <tr><td>Password :</td><td> <input type="password" name="pass1" /></td></tr>
                 <tr><td>Password Again :</td><td> <input type="password" name="pass2" /></td></tr>
                 </table>
@@ -64,12 +65,15 @@ if (file_exists($config["dbname"])) {
                     username VARCHAR(30) NOT NULL PRIMARY KEY UNIQUE,
                     status longtext,
                     password VARCHAR(64) NOT NULL,
-                    salt VARCHAR(3) NOT NULL
+                    salt VARCHAR(3) NOT NULL,
+                    active integer,
+                    email VARCHAR(30) NOT NULL
                 )";
             $results = $base->exec($query);
 
             //retrieve our data from POST
             $username = $_POST['username'];
+            $email = $_POST['email'];
             $pass1 = $_POST['pass1'];
             $pass2 = $_POST['pass2'];
             // check if both passwords are identical
@@ -94,8 +98,8 @@ if (file_exists($config["dbname"])) {
 
             // Add the user to the database
             $status = "admin";
-            $addUser = "INSERT INTO user(username, status, password, salt)
-                VALUES ('$username', '$status' , '$hash' ,'$salt')";
+            $addUser = "INSERT INTO user(username, status, password, salt, active, email)
+                VALUES ('$username', '$status' , '$hash' ,'$salt', 1, '$email')";
             $base->exec($addUser);
 
             // Create snippets table
@@ -109,9 +113,20 @@ if (file_exists($config["dbname"])) {
                 date date,
 				private integer,
 				highlight longtext,
-				lines integer
+				lines integer,
+                tags longtext,
+                score real,
+                rate_counter integer
                 )";
             $base->exec($createSnippetsDatabase);
+
+            // create scoring trace database
+            $createScoringDatabase = "CREATE TABLE scoring(
+                ID INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,
+                username longtext,
+                snippet integer
+                )";
+            $base->exec($createScoringDatabase);
 
             // Create settings table
             $createSettingsDatabase = "CREATE TABLE settings(
@@ -122,6 +137,14 @@ if (file_exists($config["dbname"])) {
                 prismtheme longtext
                 )";
             $base->exec($createSettingsDatabase);
+
+            // Create tags table
+            $createTagsDatabase = "CREATE TABLE tags(
+                ID INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,
+                tag longtext,
+                count integer
+                )";
+            $base->exec($createTagsDatabase);
 
             // Add default settings to database
             $addDefaultSettings = "INSERT INTO settings(username, title, theme, prismtheme)

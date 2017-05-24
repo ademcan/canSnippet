@@ -9,6 +9,11 @@
 ini_set('display_errors', 'On');
 error_reporting(E_ALL);
 
+
+ini_set('display_startup_errors', 1);
+ini_set('display_errors', 1);
+error_reporting(-1);
+
 require_once('../config.php');
 if (!isset($_SESSION))
     session_start();
@@ -22,10 +27,20 @@ else {
 ob_start();
 setlocale(LC_CTYPE, 'fr_FR.UTF-8');
 
+// $dbname = '../snippets.sqlite';
+// $base = new SQLite3($dbname);
+// $username = $_SESSION['username'];
+// $queryU = "SELECT * FROM user WHERE username=\"".$username."\" ";
+// $resultsU = $base->query($queryU);
+// $rowU = $resultsU->fetchArray();
+// $status = $rowU["status"];
+
+
 $search  = array('&'    , '"'     , "'"    , '<'   , '>'    );
 $replace = array('&amp;', '&quot;', '&#39;', '&lt;', '&gt;' );
 if(!isset($_GET["action"]))
 	$_GET["action"] = "";
+
 // Delete a snippet based on its identifier
 if (($_GET["action"] == "delete")) {
     // connection to the database
@@ -39,10 +54,31 @@ if (($_GET["action"] == "delete")) {
     header("location:index.php");
 }
 
+
+
+
+if (($_GET["action"] == "deleteuser")) {
+    $dbname = '../snippets.sqlite';
+    $base = new SQLite3($dbname);
+    // sql command to delete the user
+    $username = $_GET["id"];
+    $query_name = "DELETE FROM user WHERE username=\"".$username."\" ";
+    $results_name = $base->query($query_name);
+    header("location:action.php?action=users");
+}
+
+
 // Edit a snippet based on its identifier
 if (($_GET["action"] == "edit")) {
     $mytable = "snippets";
     $base = new SQLite3("../".$config['dbname']);
+
+    $username = $_SESSION['username'];
+    $queryU = "SELECT * FROM user WHERE username=\"".$username."\" ";
+    $resultsU = $base->query($queryU);
+    $rowU = $resultsU->fetchArray();
+    $status = $rowU["status"];
+
     $query_name = "SELECT * FROM $mytable WHERE ID=" . $_GET["id"] . " ";
     $results_name = $base->query($query_name);
     // Edit page
@@ -100,21 +136,27 @@ if (($_GET["action"] == "edit")) {
             <tr><td>Code</td><td><textarea name="code" style="width:500px;height:300px;">';
         echo $row['code'];
         echo '</textarea></td></tr>';
-        echo '<tr><td>Line numbers</td><td><input type="checkbox" name="lines" value="on" ';
-        if ($row['lines'] == "on") {
-            echo "checked";
-        } echo'></td></tr>';
 
-        echo '<tr><td>Highlight lines</td><td><input type="text" name="highlight" style="width:500px;" value="';
-        echo $row['highlight'];
-        echo '"/></td></tr>
-        <tr><td></td><td>Examples:<br>5 : The 5th line<br>1-5 : Lines 1 through 5<br>1,4 : Line 1 and line 4<br>1-2, 5, 9-20 : Lines 1 through 2, line 5, lines 9 through 20 </td></tr>';
+        echo '<tr><td>Tags (comma-separated)</td><td><input type="text" name="tags" style="width:500px;" value="';
+        echo $row['tags'];
+        echo '"/></td></tr>';
 
-        echo '<tr><td>Private</td><td><input type="checkbox" name="private" value="on" ';
-        if ($row['private'] == "on") {
-            echo "checked";
-        } echo'></td></tr>
-            </table>
+        echo '<input hidden="true" type="text" name="old_tags" style="width:500px;" value="';
+        echo $row['tags'];
+        echo '"/></td></tr>';
+
+
+        if ($status == "admin"){
+            echo '<tr><td>Private</td><td><input type="checkbox" name="private"';
+            if ($row['private'] == "on") {
+                echo "checked></td></tr>";
+            }
+        }
+        else {
+            echo '<input type="checkbox" name="private" checked type="hidden"/>';
+        }
+
+        echo'</table>
             <input class="loginButton" type="submit" value="Update snippet"/>
         </form>
     </div> ';
@@ -128,15 +170,46 @@ if (($_GET["action"] == "edit")) {
         $name = str_replace($search, $replace, $name);
         $description = str_replace($search, $replace, $_POST['description']);
         $code = str_replace($search, $replace, $code);
+        $old_tags = $_POST['old_tags'];
+
+        // update the list of tags
+        $oldTagsList=explode(",",$old_tags);
+        foreach($oldTagsList as $var){
+            $lowtag = strtolower($var);
+            $query = "UPDATE tags SET count=count-1 WHERE tag=\"".$lowtag."\" ";
+            $results = $base->exec($query);
+        }
+
+        $tags = $_POST['tags'];
+        $tagsList=explode(",",$tags);
+        foreach($tagsList as $var){
+            $lowtag = strtolower($var);
+            $count_query = "SELECT count(*) as count FROM tags WHERE tag=\"".$lowtag."\" ";
+            $results_count = $base->query($count_query);
+            $row_count = $results_count->fetchArray();
+            $tags_count = $row_count['count'];
+
+            if ($tags_count == 0){
+                $query = "INSERT INTO tags(tag, count) VALUES ('$lowtag', 1)";
+            }
+            else{
+                $query = "UPDATE tags SET count=count+1 WHERE tag=\"".$lowtag."\" ";
+            }
+            $results = $base->exec($query);
+        }
+
 
         $private = (isset($_POST['private']) && $_POST['private'] === "on")?"on":"off";
         $lines = (isset($_POST['lines']) && $_POST['lines'] === "on")?"on":"off";
         $id = $_GET['id'];
-        $query_update = "UPDATE $mytable set name='$name', code='$code', language='$language', description='$description', private='$private', lines='$lines', highlight='$highlight' where ID='$id' ";
+        $query_update = "UPDATE $mytable set name='$name', code='$code', language='$language', description='$description', private='$private', lines='$lines', highlight='$highlight', tags='$tags'  where ID='$id' ";
         $results = $base->exec($query_update);
+
         header("location:index.php");
     }
 }
+
+
 
 // Save new snippet to the database
 if (isset($_POST["add"])) {
@@ -149,8 +222,13 @@ if (isset($_POST["add"])) {
     $description = str_replace($search, $replace, $description);
 
     $code = $_POST['code'];
-    $private = (isset($_POST['private']) && $_POST['private'] == "on")?"on":"off";
-    $lines = (isset($_POST['lines']) && $_POST['lines'] == "on")?"on":"off";
+    // Force code to be private at first save, needs to be validated by one admin user
+    // $private = $_POST['private'];
+    // $private = (isset($_POST['private']) && $_POST['private'] = "on")?"on":"off";
+    $private = "on";
+    // $lines = (isset($_POST['lines']) && $_POST['lines'] == "on")?"on":"off";
+    // Force adding the line numbers in all the snippets
+    $lines = "on";
     $highlight = $_POST['highlight'];
     $date = date("F j, Y - H:i");
     // connect to the database
@@ -158,14 +236,36 @@ if (isset($_POST["add"])) {
     $base = new SQLite3("../".$config['dbname']);
 
     $code = iconv('UTF-8', 'ISO-8859-15', htmlspecialchars($_POST['code'], ENT_QUOTES));
-
+    $tags = $_POST['tags'];
     $username = $_SESSION['username'];
-    $query = "INSERT INTO $mytable(username, language, name, description, code, private, lines, highlight,  date)
-                    VALUES ('$username', '$language', '$name', '$description', '$code', '$private', '$lines','$highlight' , '$date')";
+    $query = "INSERT INTO $mytable(username, language, name, description, code, private, lines, highlight, date, tags)
+                    VALUES ('$username', '$language', '$name', '$description', '$code', '$private', '$lines','$highlight' , '$date', '$tags' )";
     $results = $base->exec($query);
+
+    // save the tags to the tags database
+    // loop through the comma separated text and save everithing as small letter (?)
+    $tagsList=explode(",",$tags);
+    foreach($tagsList as $var){
+        $lowtag = strtolower($var);
+        $count_query = "SELECT count(*) as count FROM tags WHERE tag=\"".$lowtag."\" ";
+        $results_count = $base->query($count_query);
+        $row_count = $results_count->fetchArray();
+        $tags_count = $row_count['count'];
+
+        if ($tags_count == 0){
+            $query2 = "INSERT INTO tags(tag, count) VALUES ('$lowtag', 1)";
+        }
+        else{
+            $query2 = "UPDATE tags SET count=count+1 WHERE tag=\"".$lowtag."\" ";
+        }
+        $results = $base->exec($query2);
+    }
+
     // returns to the main admin page
     header("location:index.php");
 }
+
+
 
 // Page for adding new snippet
 if (($_GET["action"] == "add")) {
@@ -181,7 +281,7 @@ if (($_GET["action"] == "add")) {
 
                 <tr><td>Title</td><td><input type="text" name="name" style="width:500px;"/></td></tr>
                 <tr><td width="200px">Language</td><td>
-                        <select id="language" name="language">
+                        <select id="language" name="language" style="max-width:40%;">
                             <option value="c">c</option>
                             <option value="c++">c++</option>
                             <option value="css">css</option>
@@ -195,14 +295,13 @@ if (($_GET["action"] == "add")) {
                             <option value="text">text</option>
                         </select>
 
+                        <select id="version" name="version" style="max-width:40%;">
+
                     </td></tr>
                 <tr><td>Description</td><td><textarea name="description" style="width:500px;height:100px;"></textarea></td></tr>
                 <tr><td>Code</td><td><textarea name="code" style="width:500px;height:300px;"></textarea></td></tr>
-                <tr><td>Line numbers</td><td><input type="checkbox" name="lines" value="on"></td></tr>
-                <tr><td>OR</td></tr>
-                <tr><td>Highlight lines</td><td><input type="text" name="highlight" style="width:500px;"/></td></tr>
-                <tr><td></td><td style="background-color:lightgray;"><u>Examples for lines highlighting :</u><br>5 : The 5th line<br>1-5 : Lines 1 through 5<br>1,4 : Line 1 and line 4<br>1-2, 5, 9-20 : Lines 1 through 2, line 5, lines 9 through 20</td></tr>
-                <tr><td>Private</td><td><input type="checkbox" name="private" value="on"></td></tr>
+                <tr><td>Tags (comma-separated)</td><td><input type="text" name="tags" style="width:500px;"/></td></tr>
+
             </table>
             <input name="add" type="hidden" />
             <input class="loginButton" type="submit" value="Add snippet" class="submit"/>
@@ -211,17 +310,24 @@ if (($_GET["action"] == "add")) {
     </div>
     </div>
     </body>
+
+    <script>
+    daySelect = document.getElementById('version');
+    document.getElementById("language").onchange = function(e) {
+        var index = this.selectedIndex;
+        var inputText = this.children[index].innerHTML.trim();
+        // alert(inputText);
+        if (inputText == "python"){
+            // add python version
+            daySelect.options[daySelect.options.length] = new Option('Text 1', 'Value1');
+            daySelect.options[daySelect.options.length] = new Option('Text 2', 'Value2');
+        }
+    }
+    </script>
+
     </html>
     <?php
 }
-
-
-
-
-
-
-
-
 
 
 
@@ -262,7 +368,7 @@ if (($_GET["action"] == "users")) {
             echo '<tr>';
             echo '<td>'.$name.'</td><td>'.$status.'</td><td>';
             echo '<a href="action.php?action=edituser&id=' . $name . '" class="editButton">Edit</a>';
-            echo '<a href="action.php?action=deleteuser&id=' . $name . '" onclick="return confirm(\'Do you really want to delete this snippet ?\');" class="deleteButton">Delete</a></td></tr>';
+            echo '<a href="action.php?action=deleteuser&id=' . $name . '" onclick="return confirm(\'Do you really want to delete this user ?\');" class="deleteButton">Delete</a></td></tr>';
 
         }
         echo "</table><br><br>";
@@ -296,6 +402,94 @@ if (($_GET["action"] == "users")) {
 
 
 
+// Page for editing user
+if (($_GET["action"] == "edituser")) {
+    include 'admin-menu.php';
+
+    $dbname = '../snippets.sqlite';
+    $mytable = "user";
+    $base = new SQLite3($dbname);
+    $id=$_GET["id"];
+    $user_query = "SELECT * FROM $mytable WHERE username=\"".$id."\" ";
+
+    $resultsU = $base->query($user_query);
+    $rowU = $resultsU->fetchArray();
+    $status = $rowU["status"];
+    $username = $rowU["username"];
+    $active = $rowU["active"];
+    $email = $rowU["email"];
+    ?>
+
+    <h1>Edit user</h1>
+
+    <div id="newSnippet">
+
+        <form action="action.php" method="post">
+            <table>
+            <tr><td width="150px">Username :</td><td> <input type="text" name="username" maxlength="30" value=<?php echo $username ?> /></td></tr>
+            <tr><td width="150px">Email :</td><td> <input type="text" name="email" maxlength="40" value=<?php echo $email ?> /></td></tr>
+            <tr><td> Role </td><td>
+            <select id="status" name="status">
+                <?php
+                if($status == "admin"){
+                    echo '<option name="isadmin" value="admin" selected>admin</option>';
+                    echo '<option name="isadmin" value="noadmin">no-admin</option>';
+                }
+                else{
+                    echo '<option name="isadmin" value="admin">admin</option>';
+                    echo '<option name="isadmin" value="noadmin" selected>no-admin</option>';
+
+                }
+                ?>
+
+            </select>
+            </td></tr>
+                <?php
+                if ($active == 1){
+                    echo '<tr><td>Active :</td><td> <input type="checkbox" name="active" checked /></td></tr>';
+                }
+                else {
+                    echo '<tr><td>Active :</td><td> <input type="checkbox" name="active" /></td></tr>';
+                }
+                ?>
+            </table>
+            </center>
+            <input name="edituser" type="hidden" />
+            <input type="submit" value="Edit user" class="installButton"/>
+        </form>
+        </div>
+        </div>
+        </body>
+        </html>
+
+        <?php
+
+
+}
+
+// Edit user details
+if (isset($_POST["edituser"])) {
+
+    $dbname = '../snippets.sqlite';
+    $base = new SQLite3($dbname);
+    $id=$_POST["username"];
+    $isadmin=$_POST["status"];
+    $email=$_POST["email"];
+    if ($_POST['active'] == "on"){
+        $query_update = "UPDATE user set active=1, status=\"".$isadmin."\", email=\"".$email."\" where username=\"".$id."\" ";
+        $results = $base->exec($query_update);
+        header("location:action.php?action=users");
+    }
+    else {
+        $query_update = "UPDATE user set active=0, status=\"".$isadmin."\", email=\"".$email."\"  where username=\"".$id."\" ";
+        $results = $base->exec($query_update);
+        header("location:action.php?action=users");
+    }
+
+}
+
+
+
 
 // Page for adding new snippet
 if (($_GET["action"] == "adduser")) {
@@ -309,6 +503,7 @@ if (($_GET["action"] == "adduser")) {
         <form action="action.php" method="post">
             <table>
             <tr><td width="150px">Username :</td><td> <input type="text" name="username" maxlength="30" /></td></tr>
+            <tr><td width="150px">Email :</td><td> <input type="text" name="email" maxlength="40" /></td></tr>
             <tr><td> Role </td><td>
             <select id="status" name="status">
                 <option value="admin">admin</option>
@@ -331,6 +526,10 @@ if (($_GET["action"] == "adduser")) {
 }
 
 
+
+
+
+
 // Save new user to the database
 if (isset($_POST["adduser"])) {
 
@@ -341,6 +540,7 @@ if (isset($_POST["adduser"])) {
     $username = $_POST['username'];
     $pwd = $_POST['pass1'];
     $status = $_POST['status'];
+    $email = $_POST['email'];
 
     $hash = hash('sha256', $pwd);
     //creates a 3 character sequence for salt
@@ -354,12 +554,12 @@ if (isset($_POST["adduser"])) {
 
 
     // Add the user to the database
-    $addUser = "INSERT INTO user(username, status, password, salt)
-        VALUES ('$username', '$status' , '$hash' ,'$salt')";
+    $addUser = "INSERT INTO user(username, status, password, salt, active, email)
+        VALUES ('$username', '$status' , '$hash' ,'$salt', 1, '$email')";
     $base->exec($addUser);
 
     // returns to the main admin page
-    header("location:index.php");
+    header("location:action.php?action=users");
 }
 
 
