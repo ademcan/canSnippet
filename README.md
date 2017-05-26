@@ -1,10 +1,11 @@
+# canSnippet v1.0 beta
+**Author**: ademcan (ademcan@ademcan.net)
 
-canSnippet v1.0 beta
+**Version**: 1.0 beta
 
-Author: ademcan (ademcan@ademcan.net)
-Version: 1.0 beta
-License: CC BY
+**License**: CC BY
 
+## Description
 canSnippet is an open source web-based application to save and share your snippets.
 The advantages of canSnippet are :
 - it's green (literally)
@@ -22,28 +23,35 @@ The advantages of canSnippet are :
 - responsive design
 - it's flat-green :)
 
-Known issues :
+##  Known issues
 If you have a \ (backslash) before quotes (for example on the title) add the following line to your .htaccess :
 SetEnv MAGIC_QUOTES 0 
 
 Alternatives to canSnippet :
-SnippetVamp
+* [SnippetVamp](https://github.com/broncowdd/SnippetVamp)
 
-Installation :
+## Installation
 - Download the latest canSnippet.zip file
 - send the zip file to your server and unzip
 - open the following URL in your web browser
-http://[YOUR_DOMAIN]/canSnippet/
+`http://[YOUR_DOMAIN]/canSnippet/`
 - Follow the unique instruction (i.e. fill in the form)
 - Remove the install.php file for better security
 - You are done ! Now you canSnippet...
 - If you use nginx add the following line to protect your sqlite file
-	location ~ \.sqlite {
-		deny all;
-	}
+```nginx
+location ~ \.sqlite {
+	deny all;
+}
+````
 
-Screenshots:
-http://ademcan.net/gallery/?dir=canSnippet
+----
+## Screenshots
+![Home page](https://ademcan.net/gallery/photos/canSnippet/homePage.png)
+![Browse page](https://ademcan.net/gallery/photos/canSnippet/browsePage.png)
+![Admin interface](https://ademcan.net/gallery/photos/canSnippet/adminInterface.png)
 
-Demo :
-http://ademcan.net/canSnippet/
+[http://ademcan.net/gallery/?dir=canSnippet](http://ademcan.net/gallery/?dir=canSnippet)
+
+## Demo
+[http://ademcan.net/canSnippet/](http://ademcan.net/canSnippet/)
