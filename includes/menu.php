@@ -50,7 +50,7 @@ function isLoggedIn()
         </center>
         <a href="index.php" class="button"> Accueil </a>
         <a href="browse.php" class="button"> Recherche </a>
-        <a href="rss/" class="rssButton">RSS </a>
+        <a href="rss/" class="button">RSS </a>
         <?php
             if(isLoggedIn())
             {

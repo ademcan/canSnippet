@@ -215,10 +215,13 @@ if (($_GET["action"] == "edit")) {
 if (isset($_POST["add"])) {
     // get values
     $language = $_POST['language'];
-    $name = iconv('UTF-8', 'ISO-8859-15', $_POST['name']);
+
+    // $name = iconv('UTF-8', 'ISO-8859-15', $_POST['name']);
+    // $name = str_replace($search, $replace, $name);
+    $name= $_POST['name'];
+
     $description = iconv('UTF-8', 'ISO-8859-15', $_POST['description']);
 
-    $name = str_replace($search, $replace, $name);
     $description = str_replace($search, $replace, $description);
 
     $code = $_POST['code'];
