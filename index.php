@@ -50,7 +50,7 @@
     }
 
 
-    $query_name = "SELECT * FROM $mytable WHERE private != 'on' ORDER BY date DESC LIMIT $start_count,$limit";
+    $query_name = "SELECT * FROM $mytable WHERE private != 'on' ORDER BY date ASC LIMIT $start_count,$limit";
     $results_name = $base->query($query_name);
     $settingsQuery = "SELECT * FROM settings";
     $settingsInfo = $base->query($settingsQuery);
@@ -94,7 +94,7 @@
             $languageClass = "language-".$language;
         }
 
-        echo '<img src="images/calendar.png" style="padding-right:5px;"/>'.$date.'&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<img src="images/author.png" style="padding-left:10px;padding-right:5px;"/>'.$username.'&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<img src="images/tag.png" style="padding-left:10px;padding-right:5px;"/> ';
+        echo '<div style="word-wrap: break-word;"><img src="images/calendar.png" style="padding-right:5px;"/>'.$date.'&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<img src="images/author.png" style="padding-left:10px;padding-right:5px;"/>'.$username.'&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<img src="images/tag.png" style="padding-left:10px;padding-right:5px;"/> ';
 
         $tags = $row['tags'];
         $tagsList=explode(",",$tags);
@@ -103,7 +103,7 @@
             $lowtag = str_replace(' ', '', $lowtag);
             echo '<a href="tags.php?tag='.$lowtag.'" style="color:black;text-decoration:underline">'.$lowtag.'</a>&nbsp;';
         }
-        echo "<br>";
+        echo "</div><br>";
 
         echo '<img src="images/comment.png" style="vertical-align: middle;"/>';
         echo '&nbsp;&nbsp;'.nl2br($description);
@@ -112,11 +112,11 @@
         if (isLoggedIn()){
             if (!in_array($id, $score_array)){
                 echo '<div class="rating" id="rating_div">
-                <input type="radio" id="star5" name="rating" value="5" onclick="javascript:rating('.$id.') "/><label for="star5" title="Rocks!">5 stars</label>
-                <input type="radio" id="star4" name="rating" value="4" onclick="javascript:rating('.$id.')"/><label for="star4" title="Pretty good">4 stars</label>
-                <input type="radio" id="star3" name="rating" value="3" onclick="javascript:rating('.$id.')"/><label for="star3" title="Meh">3 stars</label>
-                <input type="radio" id="star2" name="rating" value="2" onclick="javascript:rating('.$id.')"/><label for="star2" title="Kinda bad">2 stars</label>
-                <input type="radio" id="star1" name="rating" value="1" onclick="javascript:rating('.$id.')"/><label for="star1" title="Sucks big time">1 star</label>
+                <input type="radio" id="star5" name="rating" value="5" onclick="javascript:rating('.$id.') "/><label for="star5" title="THE snippet">5 stars</label>
+                <input type="radio" id="star4" name="rating" value="4" onclick="javascript:rating('.$id.')"/><label for="star4" title="Bien cool">4 stars</label>
+                <input type="radio" id="star3" name="rating" value="3" onclick="javascript:rating('.$id.')"/><label for="star3" title="Pas mal">3 stars</label>
+                <input type="radio" id="star2" name="rating" value="2" onclick="javascript:rating('.$id.')"/><label for="star2" title="Bof">2 stars</label>
+                <input type="radio" id="star1" name="rating" value="1" onclick="javascript:rating('.$id.')"/><label for="star1" title="Looser">1 star</label>
                 </div>';
             }
         }

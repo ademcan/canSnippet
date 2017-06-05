@@ -18,7 +18,7 @@ require_once('../config.php');
 if (!isset($_SESSION))
     session_start();
 
-// we block the acces to no authenticated people
+// we block the acces to non-authenticated people
 if (!isset($_SESSION['valid']) || !$_SESSION['valid']) {
     header("location:login.php");
 }
@@ -153,7 +153,7 @@ if (($_GET["action"] == "edit")) {
             }
         }
         else {
-            echo '<input type="checkbox" name="private" checked type="hidden"/>';
+            
         }
 
         echo'</table>
@@ -241,8 +241,8 @@ if (isset($_POST["add"])) {
     $code = iconv('UTF-8', 'ISO-8859-15', htmlspecialchars($_POST['code'], ENT_QUOTES));
     $tags = $_POST['tags'];
     $username = $_SESSION['username'];
-    $query = "INSERT INTO $mytable(username, language, name, description, code, private, lines, highlight, date, tags)
-                    VALUES ('$username', '$language', '$name', '$description', '$code', '$private', '$lines','$highlight' , '$date', '$tags' )";
+    $query = "INSERT INTO $mytable(username, language, name, description, code, private, lines, highlight, date, tags, score, rate_counter)
+                    VALUES ('$username', '$language', '$name', '$description', '$code', '$private', '$lines','$highlight' , '$date', '$tags', 0,0 )";
     $results = $base->exec($query);
 
     // save the tags to the tags database
@@ -586,10 +586,21 @@ if (($_GET["action"] == "preferences")) {
     $query_name = "SELECT * FROM settings ";
     $results_name = $base->query($query_name);
     $row = $results_name->fetchArray();
-    ?>
 
-    <h1>Preferences</h1>
-    <div id="newSnippet">
+    $username = $_SESSION['username'];
+    $queryU = "SELECT * FROM user WHERE username=\"".$username."\" ";
+    $resultsU = $base->query($queryU);
+    $rowU = $resultsU->fetchArray();
+    $status = $rowU["status"];
+
+
+
+    echo "<h1>Preferences</h1>";
+    echo "<div id='newSnippet'>";
+
+    // show css settings only to admins
+    if ($status == "admin"){
+    ?>
 
     <h2>Change prism theme</h2>
     <br>
@@ -609,7 +620,10 @@ if (($_GET["action"] == "preferences")) {
         <br>
     <hr>
 
+
+
     <?php
+    }
     // get user pasword information
     $query_pwd = "SELECT * FROM user ";
     $results_pwd = $base->query($query_pwd);
@@ -662,7 +676,7 @@ if (($_GET["action"] == "preferences")) {
 
             $salt = createSalt();
             $hash = hash('sha256', $salt . $hash);
-            $queryUpdatePwd = "UPDATE user SET password='$hash', salt='$salt' ";
+            $queryUpdatePwd = "UPDATE user SET password='$hash', salt='$salt' WHERE username='$username' ";
             $base->exec($queryUpdatePwd);
             echo "<script>alert('Password successfuly changed!'); location.href='action.php?action=preferences';</script>";
         } else {

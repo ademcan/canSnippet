@@ -103,13 +103,13 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
             <?php
         }
     }
-
+    // Login
     else{
         $username = $_POST['username'];
         $password = $_POST['password'];
         //connect to the database here
         $username = SQLite3::escapeString($username);
-        $query = "SELECT password, salt
+        $query = "SELECT password, salt, active
                 FROM user
                 WHERE username = '$username';";
         $result = $base-> query($query);
@@ -135,13 +135,27 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
         //login successful
         else
         {
-            $_SESSION['valid'] = 1;
-            $_SESSION['username'] = $username;
-            ?>
-                <script>
-                    location.href = '../admin/index.php';
-                </script>
-            <?php
+
+            if( $userData['password'] != 1)
+            {
+                ?>
+                    <script>
+                        alert("Your account has been inactiated. Please contact the admins!");
+                        location.href = 'index.php';
+                    </script>
+                <?php
+            }
+            else{
+                $_SESSION['valid'] = 1;
+                $_SESSION['username'] = $username;
+                ?>
+                    <script>
+                        location.href = '../admin/index.php';
+                    </script>
+                <?php
+            }
+
+
         }
 
     }

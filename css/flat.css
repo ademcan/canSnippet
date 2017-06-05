@@ -137,6 +137,17 @@ input.installButton:hover{
     background-color: #27ae60;
 }
 
+button.homeButton{
+    position:relative;
+    width: 100px;
+    height: 50px;
+    box-shadow: none;
+    border-style: none;
+    background-color: #F3F3F3;
+    color: black;
+}
+
+
 input.loginButton{
     position:relative;
     top: 20px;

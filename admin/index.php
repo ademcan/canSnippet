@@ -40,12 +40,12 @@ if (isset($_SESSION['valid']) && $_SESSION['valid']) {
 
     if ($status == "admin"){
         // If admin, show all the snippets
-        $query_name = "SELECT * FROM $mytable ORDER BY date DESC LIMIT $start_count,$limit";
+        $query_name = "SELECT * FROM $mytable ORDER BY date ASC LIMIT $start_count,$limit";
         $title = "All snippets";
     }
     else {
         // If not admin show only user's snippets
-        $query_name = "SELECT * FROM $mytable WHERE username=\"".$username."\" ORDER BY date DESC LIMIT $start_count,$limit";
+        $query_name = "SELECT * FROM $mytable WHERE username=\"".$username."\" ORDER BY date ASC LIMIT $start_count,$limit";
         $title = "My snippets";
     }
 
@@ -74,10 +74,10 @@ if (isset($_SESSION['valid']) && $_SESSION['valid']) {
         $description = $row['description'];
         $id = $row['ID'];
         if ($private=="on"){
-            echo '<h2><font color="#27ae60">'.$name.'</font><img src="../images/lockFlat.png" style="width:20px; height: 20px;padding-left:10px;" /></h2>';
+            echo '<div style="background-color:#BDEDFF;margin-top:20px;"><h2><font color="#27ae60">'.$name.'</font><img src="../images/lockFlat.png" style="width:20px; height: 20px;padding-left:10px;" /></h2>';
         }
         else{
-            echo '<h2><font color="#27ae60">'.$name.'</font></h2>';
+            echo '<div><h2><font color="#27ae60">'.$name.'</font></h2>';
         }
 
         if ($language=="html"){
@@ -101,7 +101,7 @@ if (isset($_SESSION['valid']) && $_SESSION['valid']) {
         echo '<section class="'.$languageClass.'"> <pre class="line-numbers"><code>'.$code.'</code></pre> </section>';
         echo '<a href="action.php?action=edit&id=' . $row['ID'] . '" class="editButton">Edit</a>';
         echo '<a href="action.php?action=delete&id=' . $row['ID'] . '" onclick="return confirm(\'Do you really want to delete this snippet ?\');" class="deleteButton">Delete</a>';
-        echo '<hr><br>';
+        echo '<hr><br></div>';
     }
 
     echo "<br><br>";

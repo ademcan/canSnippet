@@ -57,7 +57,7 @@ function isLoggedIn()
                 echo '<hr>';
 //                echo '<br>Welcome ', $_SESSION['username'] ,' ';
                 echo '<a href="admin/index.php" class="button">';
-                echo 'Admin </a>';
+                echo 'Mon compte </a>';
                 echo '<a href="logout.php" class="logoutButton">';
                 echo 'Logout </a>';
             }
