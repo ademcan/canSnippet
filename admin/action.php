@@ -51,7 +51,32 @@ if (($_GET["action"] == "delete")) {
     $query_name = "DELETE FROM $mytable WHERE ID=" . $_GET["id"] . "";
     $results_name = $base->query($query_name);
     // returns to the main admin page
-    header("location:index.php");
+    header("location:index.php?view=all");
+}
+
+
+
+
+// Activate a snippet based on its identifier
+if (($_GET["action"] == "activate")) {
+    // connection to the database
+    $mytable = "snippets";
+    $base = new SQLite3("../".$config['dbname']);
+    $query_name = "UPDATE $mytable SET private='off' WHERE ID=" . $_GET["id"] . "";
+    $results_name = $base->query($query_name);
+    // returns to the main admin page
+    header("location:index.php?view=all");
+}
+
+// Deactivate a snippet based on its identifier
+if (($_GET["action"] == "deactivate")) {
+    // connection to the database
+    $mytable = "snippets";
+    $base = new SQLite3("../".$config['dbname']);
+    $query_name = "UPDATE $mytable SET private='on' WHERE ID=" . $_GET["id"] . "";
+    $results_name = $base->query($query_name);
+    // returns to the main admin page
+    header("location:index.php?view=all");
 }
 
 
@@ -66,6 +91,198 @@ if (($_GET["action"] == "deleteuser")) {
     $results_name = $base->query($query_name);
     header("location:action.php?action=users");
 }
+
+
+
+
+
+if (($_GET["action"] == "allsnippets")) {
+    $dbname = '../snippets.sqlite';
+    $mytable = "snippets";
+    $base = new SQLite3($dbname);
+
+    // $count_query = "SELECT count(*) as count FROM $mytable";
+    // $results_count = $base->query($count_query);
+
+
+
+    $view = $_GET['view'];
+
+    if ($view == "all"){
+        $count_query = "SELECT count(*) as count FROM $mytable";
+        $results_count = $base->query($count_query);
+    }
+    elseif ($view == "public"){
+        $count_query = "SELECT count(*) as count FROM $mytable  WHERE private='off'";
+        $results_count = $base->query($count_query);
+    }
+    else {
+        $count_query = "SELECT count(*) as count FROM $mytable  WHERE private='on' ";
+        $results_count = $base->query($count_query);
+    }
+
+
+    $row_count = $results_count->fetchArray();
+    $snippets_count = $row_count['count'];
+    $limit = 10;
+    $page = 1;
+
+    if (isset($_GET['page'])) {
+        $page = $_GET['page'];
+    }
+    $start_count = $limit * ($page - 1);
+
+    $username = $_SESSION['username'];
+
+
+    $queryU = "SELECT * FROM user WHERE username=\"".$username."\" ";
+    $resultsU = $base->query($queryU);
+    $rowU = $resultsU->fetchArray();
+    $status = $rowU["status"];
+
+
+    // if ($status == "admin"){
+    //     // If admin, show all the snippets
+    //     $query_name = "SELECT * FROM $mytable ORDER BY date ASC LIMIT $start_count,$limit";
+    //     $title = "All snippets";
+    // }
+    // else {
+    //     // If not admin show only user's snippets
+    //
+    // }
+    include 'admin-menu.php';
+
+    if ($view == "all"){
+        $query_name = "SELECT * FROM $mytable ORDER BY date DESC LIMIT $start_count,$limit";
+    }
+    elseif ($view == "public"){
+        $query_name = "SELECT * FROM $mytable WHERE private='off' ORDER BY date DESC LIMIT $start_count,$limit";
+    }
+    else {
+        $query_name = "SELECT * FROM $mytable WHERE private='on' ORDER BY date DESC LIMIT $start_count,$limit";
+    }
+
+    // $query_name = "SELECT * FROM $mytable ORDER BY date DESC LIMIT $start_count,$limit";
+
+
+    $title = "Tous les snippets (".$snippets_count.")";
+
+    $results_name = $base->query($query_name);
+
+    echo '<h1>'.$title.'</h1>';
+
+    echo '<div style="margin-left:20px;"><b>Visualiser</b> : <a href="action.php?action=allsnippets&view=all" class="editButton" style="margin-right:10px !important; ">Tous</a>';
+    echo '<a href="action.php?action=allsnippets&view=public" class="greenButton" style="margin-right:10px !important; ">Actifs</a>';
+    echo '<a href="action.php?action=allsnippets&view=private" class="deleteButton">Inactifs</a></div><div id="newSnippet">';
+
+
+    if ($snippets_count == 0){
+        echo "You don't have any snippet yet, you can add new snippets from 'New snippet' menu.";
+    }
+
+    // Loop and write all the recent snippets
+    while($row = $results_name->fetchArray())
+    {
+        $username = $row['username'];
+        $name = $row['name'];
+        $code = $row['code'];
+        $language = $row['language'];
+        $private = $row['private'];
+        $lines = $row['lines'];
+        $highlight = $row['highlight'];
+        $date = $row['date'];
+        $description = $row['description'];
+        $tags = $row['tags'];
+
+        $id = $row['ID'];
+
+        if ($private=="on"){
+            echo '<div style="background-color:#BDEDFF;margin-top:20px;"><h2><font color="#27ae60">'.$name.' ['.$language.']</font><a href="action.php?action=activate&id=' . $row['ID'] . '" onclick="return confirm(\'Do you really want to activate this snippet ?\');"><img src="../images/lockFlat.png" style="width:20px; height: 20px;padding-left:10px;" /></a></h2>';
+        }
+        else {
+            echo '<div style="margin-top:20px;"><h2><font color="#27ae60">'.$name.' ['.$language.']</font><a href="action.php?action=deactivate&id=' . $row['ID'] . '" onclick="return confirm(\'Do you really want to de-activate this snippet ?\');"><img src="../images/lockFlat_open.png" style="width:20px; height: 20px;padding-left:10px;" /></a></h2>';
+            // echo '<div style="margin-top:20px;"><h2><font color="#27ae60">'.$name.' ['.$language.']</font></h2>';
+        }
+
+
+        // if ($private=="on"){
+        //     echo '<div style="background-color:#BDEDFF;margin-top:20px;"><h2><font color="#27ae60">'.$name.' ['.$language.']</font><img src="../images/lockFlat.png" style="width:20px; height:20px;padding-left:10px;" /></h2>';
+        // }
+        // else{
+        //     echo '<div><h2><font color="#27ae60">'.$name.' ['.$language.']</font></h2>';
+        // }
+
+        if ($language=="html"){
+            $languageClass = "language-markup";
+        }
+        else if ($language=="text"){
+            $languageClass = "language-markup";
+        }
+        else{
+            $languageClass = "language-".$language;
+        }
+
+        // If admin is connected, show the snippet's creator
+        if ($status == "admin"){
+            echo '<img src="../images/author.png" style="width:13px; height:13px;padding-left:10px;padding-right:10px;"/><font size="4"><b>'.$username.'</b></font><br>';
+        }
+
+        $date=date_create($date);
+        $formattedDate = date_format($date,"d.m.Y");
+
+        echo '<img src="../images/calendar.png" style="width:13px; height:13px;padding-left:10px;padding-right:10px;"/>'.$formattedDate.'';
+        echo '<br><img src="../images/comment.png" style="width:13px; vertical-align: middle; height:13px;padding-left:10px;padding-right:10px;"/>';
+        echo ''.nl2br($description);
+
+        echo '<br /><div style="word-wrap: break-word;"><img src="../images/tag.png" style="width:13px; height:13px;padding-left:10px;padding-right:10px;"/>';
+        $tagsList=explode(",",$tags);
+        foreach($tagsList as $var){
+            // $lowtag = strtolower($var);
+            // $lowtag = str_replace(' ', '', $var);
+            $lowtag=$var;
+            echo '<u>'.$lowtag.'</u>&nbsp;';
+        }
+        echo '</div>';
+        echo '<section class="'.$languageClass.'"> <pre class="line-numbers"><code>'.$code.'</code></pre> </section>';
+        echo '<a href="action.php?action=edit&id=' . $row['ID'] . '" class="editButton">Editer</a>';
+        echo '<a href="action.php?action=delete&id=' . $row['ID'] . '" onclick="return confirm(\'Souhaitez-vous vraiment supprimer ce snippet ?\');" class="deleteButton">Supprimer</a>';
+        echo '<hr><br></div>';
+    }
+
+    echo "<br><br>";
+
+    // Pagination
+    // First page
+    if ($snippets_count > $limit & $page == 1) {
+        echo '<center><a href= "action.php?action=allsnippets&view='.$view.'&page=2"> Older snippets >>> </a></center>';
+    }
+    // Last page
+    if ($page > 1 & $snippets_count <= ($limit * $page) & $snippets_count > ($limit * ($page - 1))) {
+        echo '<center><a href= "action.php?action=allsnippets&view='.$view.'&page=' . ($page - 1) . '"> <<< Newer snippets </a></center>';
+    }
+    // Middle page
+    if ($page > 1 & $snippets_count > ($limit * $page)) {
+        echo '<center><a href= "action.php?action=allsnippets&view='.$view.'&page=' . ($page - 1) . '"> <<< Newer snippets</a> -- <a href="action.php?action=allsnippets&page=' . ($page + 1) . '">Older snippets >>></a></center>';
+    }
+
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 // Edit a snippet based on its identifier
@@ -86,12 +303,12 @@ if (($_GET["action"] == "edit")) {
     echo'<h1>Edit snippet</h1><div id="newSnippet">';
     while ($row = $results_name->fetchArray()) {
         echo'
-        <form method="post">
+        <form id="form" method="post">
         <table>
-        <tr><td>Title</td><td><input type="text" name="name" style="width:500px;" value="';
+        <tr><td>Titre</td><td><input type="text" name="name" id="name" style="width:500px;" value="';
         echo $row['name'];
         echo'"/></td></tr>
-        <tr><td width="200px">Language</td><td>
+        <tr><td width="200px">Langage</td><td>
         <select id="language" name="language" >
         <option  ';
         if ($row['language'] == 'html')
@@ -109,6 +326,23 @@ if (($_GET["action"] == "edit")) {
         if ($row['language'] == 'text')
             echo 'selected'; echo' value="text">text</option>
         <option ';
+
+        if ($row['language'] == 'R')
+            echo 'selected'; echo' value="r">r</option>
+        <option ';
+
+        if ($row['language'] == 'perl')
+            echo 'selected'; echo' value="perl">perl</option>
+        <option ';
+
+        if ($row['language'] == 'rust')
+            echo 'selected'; echo' value="rust">rust</option>
+        <option ';
+
+        if ($row['language'] == 'bash')
+            echo 'selected'; echo' value="bash">bash</option>
+        <option ';
+
         if ($row['language'] == 'c')
             echo 'selected'; echo' value="c">c</option>
         <option ';
@@ -129,15 +363,15 @@ if (($_GET["action"] == "edit")) {
 
                 </select>
                 </td></tr>
-                <tr><td>Description</td><td><textarea name="description" style="width:500px;height:100px;">';
+                <tr><td>Description</td><td><textarea name="description" id="description" style="width:500px;height:100px;">';
         echo $row['description'];
         echo '</textarea></td></tr>
 
-            <tr><td>Code</td><td><textarea name="code" style="width:500px;height:300px;">';
+            <tr><td>Code</td><td><textarea id="code" name="code" style="width:500px;height:300px;">';
         echo $row['code'];
         echo '</textarea></td></tr>';
 
-        echo '<tr><td>Tags (comma-separated)</td><td><input type="text" name="tags" style="width:500px;" value="';
+        echo '<tr><td>Tags (séparés par des virgules)</td><td><input type="text" name="tags" id="tags" style="width:500px;" value="';
         echo $row['tags'];
         echo '"/></td></tr>';
 
@@ -153,14 +387,77 @@ if (($_GET["action"] == "edit")) {
             }
         }
         else {
-            
+
         }
 
-        echo'</table>
-            <input class="loginButton" type="submit" value="Update snippet"/>
+        echo"</table>
+            <input class='loginButton' type='submit' value='Mettre à jour'/>
         </form>
-    </div> ';
+    </div>
+
+
+    <script>
+        $('#code').on('keydown', function(ev) {
+            var keyCode = ev.keyCode || ev.which;
+
+            if (keyCode == 9) {
+                ev.preventDefault();
+                var start = this.selectionStart;
+                var end = this.selectionEnd;
+                var val = this.value;
+                var selected = val.substring(start, end);
+                var re, count;
+
+                if(ev.shiftKey) {
+                    re = /^\t/gm;
+                    count = -selected.match(re).length;
+                    this.value = val.substring(0, start) + selected.replace(re, '') + val.substring(end);
+                    // todo: add support for shift-tabbing without a selection
+                } else {
+                    re = /^/gm;
+                    count = selected.match(re).length;
+                    this.value = val.substring(0, start) + selected.replace(re, '\t') + val.substring(end);
+                }
+
+                if(start === end) {
+                    this.selectionStart = end + count;
+                } else {
+                    this.selectionStart = start;
+                }
+
+                this.selectionEnd = end + count;
+            }
+        });
+
+
+
+        $(function() {
+            $('#form').on('submit', function() {
+                if( !$('#name').val() ) {
+                    alert('Veuillez saisir un titre pour votre snippet');
+                    return false;
+                }
+                if( !$('#description').val() ) {
+                    alert('Une petite description ne fait pas de mal...');
+                    return false;
+                }
+                if( !$('#code').val() ) {
+                    alert('Un snippet sans code n\'est point un snippet!');
+                    return false;
+                }
+                if( !$('#tags').val() ) {
+                    alert('Quelques tags ne feraient pas de mal!');
+                    return false;
+                }
+
+            });
+        });
+
+
+
+    </script>";
     }
+
     // Saving edited information to the database
     if ($_SERVER['REQUEST_METHOD'] == 'POST') {
 		$name = $_POST['name'];
@@ -175,7 +472,10 @@ if (($_GET["action"] == "edit")) {
         // update the list of tags
         $oldTagsList=explode(",",$old_tags);
         foreach($oldTagsList as $var){
-            $lowtag = strtolower($var);
+            // $lowtag = strtolower($var);
+            // $lowtag = str_replace(' ', '', $var);
+            $lowtag = $var;
+
             $query = "UPDATE tags SET count=count-1 WHERE tag=\"".$lowtag."\" ";
             $results = $base->exec($query);
         }
@@ -183,7 +483,9 @@ if (($_GET["action"] == "edit")) {
         $tags = $_POST['tags'];
         $tagsList=explode(",",$tags);
         foreach($tagsList as $var){
-            $lowtag = strtolower($var);
+            // $lowtag = strtolower($var);
+            // $lowtag = str_replace(' ', '', $var);
+            $lowtag = trim($var);
             $count_query = "SELECT count(*) as count FROM tags WHERE tag=\"".$lowtag."\" ";
             $results_count = $base->query($count_query);
             $row_count = $results_count->fetchArray();
@@ -205,22 +507,27 @@ if (($_GET["action"] == "edit")) {
         $query_update = "UPDATE $mytable set name='$name', code='$code', language='$language', description='$description', private='$private', lines='$lines', highlight='$highlight', tags='$tags'  where ID='$id' ";
         $results = $base->exec($query_update);
 
-        header("location:index.php");
+        header("location:index.php?view=all");
     }
 }
+
+
+
 
 
 
 // Save new snippet to the database
 if (isset($_POST["add"])) {
     // get values
+
     $language = $_POST['language'];
 
     // $name = iconv('UTF-8', 'ISO-8859-15', $_POST['name']);
     // $name = str_replace($search, $replace, $name);
     $name= $_POST['name'];
 
-    $description = iconv('UTF-8', 'ISO-8859-15', $_POST['description']);
+    // $description = iconv('UTF-8', 'ISO-8859-15', $_POST['description']);
+    $description = $_POST['description'];
 
     $description = str_replace($search, $replace, $description);
 
@@ -233,14 +540,23 @@ if (isset($_POST["add"])) {
     // Force adding the line numbers in all the snippets
     $lines = "on";
     $highlight = $_POST['highlight'];
-    $date = date("F j, Y - H:i");
+    // $date = date("F j, Y - H:i");
+    $date = date("Y-m-d");
     // connect to the database
     $mytable = "snippets";
     $base = new SQLite3("../".$config['dbname']);
 
-    $code = iconv('UTF-8', 'ISO-8859-15', htmlspecialchars($_POST['code'], ENT_QUOTES));
+    // $code = iconv('UTF-8', 'ISO-8859-15', htmlspecialchars($_POST['code'], ENT_QUOTES));
     $tags = $_POST['tags'];
     $username = $_SESSION['username'];
+
+
+    $name = str_replace($search, $replace, $name);
+    $description = str_replace($search, $replace, $_POST['description']);
+    $code = str_replace($search, $replace, $code);
+
+
+
     $query = "INSERT INTO $mytable(username, language, name, description, code, private, lines, highlight, date, tags, score, rate_counter)
                     VALUES ('$username', '$language', '$name', '$description', '$code', '$private', '$lines','$highlight' , '$date', '$tags', 0,0 )";
     $results = $base->exec($query);
@@ -249,7 +565,12 @@ if (isset($_POST["add"])) {
     // loop through the comma separated text and save everithing as small letter (?)
     $tagsList=explode(",",$tags);
     foreach($tagsList as $var){
-        $lowtag = strtolower($var);
+        // $lowtag = strtolower($var);
+        // $lowtag = str_replace(' ', '', $var);
+
+        $lowtag=trim($var);
+
+
         $count_query = "SELECT count(*) as count FROM tags WHERE tag=\"".$lowtag."\" ";
         $results_count = $base->query($count_query);
         $row_count = $results_count->fetchArray();
@@ -265,7 +586,9 @@ if (isset($_POST["add"])) {
     }
 
     // returns to the main admin page
-    header("location:index.php");
+
+    $_SESSION['newSnippet'] = 1;
+    header("location:index.php?view=all");
 }
 
 
@@ -282,8 +605,8 @@ if (($_GET["action"] == "add")) {
         <form id="form" name="newSnippet" method="post" action="action.php" accept-charset="UTF-8">
             <table>
 
-                <tr><td>Title</td><td><input type="text" name="name" style="width:500px;"/></td></tr>
-                <tr><td width="200px">Language</td><td>
+                <tr><td>Titre</td><td><input type="text" name="name" id="name" style="width:500px;"/></td></tr>
+                <tr><td width="200px">Langage</td><td>
                         <select id="language" name="language" style="max-width:40%;">
                             <option value="c">c</option>
                             <option value="c++">c++</option>
@@ -295,19 +618,22 @@ if (($_GET["action"] == "add")) {
                             <option value="python">python</option>
                             <option value="ruby">ruby</option>
                             <option value="sql">sql</option>
+                            <option value="r">R</option>
+                            <option value="bash">bash</option>
+                            <option value="perl">perl</option>
+                            <option value="rust">rust</option>
                             <option value="text">text</option>
                         </select>
 
-                        <select id="version" name="version" style="max-width:40%;">
 
                     </td></tr>
-                <tr><td>Description</td><td><textarea name="description" style="width:500px;height:100px;"></textarea></td></tr>
-                <tr><td>Code</td><td><textarea name="code" style="width:500px;height:300px;"></textarea></td></tr>
-                <tr><td>Tags (comma-separated)</td><td><input type="text" name="tags" style="width:500px;"/></td></tr>
+                <tr><td>Description</td><td><textarea name="description" id="description" style="width:500px;height:100px;"></textarea></td></tr>
+                <tr><td>Code</td><td><textarea name="code" id="code" style="width:500px;height:300px;"></textarea></td></tr>
+                <tr><td>Tags (séparés par des virgules)</td><td><input type="text" id="tags" name="tags" style="width:500px;"/></td></tr>
 
             </table>
             <input name="add" type="hidden" />
-            <input class="loginButton" type="submit" value="Add snippet" class="submit"/>
+            <input class="loginButton" type="submit" value="Ajouter snippet" class="submit"/>
 
         </form>
     </div>
@@ -315,6 +641,65 @@ if (($_GET["action"] == "add")) {
     </body>
 
     <script>
+        $('#code').on('keydown', function(ev) {
+            var keyCode = ev.keyCode || ev.which;
+
+            if (keyCode == 9) {
+                ev.preventDefault();
+                var start = this.selectionStart;
+                var end = this.selectionEnd;
+                var val = this.value;
+                var selected = val.substring(start, end);
+                var re, count;
+
+                if(ev.shiftKey) {
+                    re = /^\t/gm;
+                    count = -selected.match(re).length;
+                    this.value = val.substring(0, start) + selected.replace(re, '') + val.substring(end);
+                    // todo: add support for shift-tabbing without a selection
+                } else {
+                    re = /^/gm;
+                    count = selected.match(re).length;
+                    this.value = val.substring(0, start) + selected.replace(re, '\t') + val.substring(end);
+                }
+
+                if(start === end) {
+                    this.selectionStart = end + count;
+                } else {
+                    this.selectionStart = start;
+                }
+
+                this.selectionEnd = end + count;
+            }
+        });
+
+        $(function() {
+            $('#form').on('submit', function() {
+                if( !$("#name").val() | $("#name").val().trim().length == 0 ) {
+                    alert('Veuillez saisir un titre pour votre snippet');
+                    return false;
+                }
+                if( !$("#description").val() | $("#description").val().trim().length == 0) {
+                    alert('Une petite description ne fait pas de mal...');
+                    return false;
+                }
+                if( !$("#code").val() | $("#code").val().trim().length == 0 ) {
+                    alert('Un snippet sans code n\'est point un snippet!');
+                    return false;
+                }
+                if( !$("#tags").val() | $("#tags").val().trim().length == 0 ) {
+                    alert('Quelques tags ne feraient pas de mal!');
+                    return false;
+                }
+
+            });
+        });
+
+    </script>
+
+
+
+    <!-- <script>
     daySelect = document.getElementById('version');
     document.getElementById("language").onchange = function(e) {
         var index = this.selectedIndex;
@@ -326,7 +711,7 @@ if (($_GET["action"] == "add")) {
             daySelect.options[daySelect.options.length] = new Option('Text 2', 'Value2');
         }
     }
-    </script>
+    </script> -->
 
     </html>
     <?php
@@ -339,6 +724,7 @@ if (($_GET["action"] == "add")) {
 // Page for users configuration
 if (($_GET["action"] == "users")) {
 
+    if($_SESSION['admin']=="admin"){
         include 'admin-menu.php';
         $dbname = '../snippets.sqlite';
         $mytable = "user";
@@ -359,7 +745,8 @@ if (($_GET["action"] == "users")) {
         $query_name = "SELECT * FROM $mytable ";
         $results_name = $base->query($query_name);
 
-        echo '<h1>Registered users</h1><div id="newSnippet">';
+
+        echo '<h1>Utilisateurs enregistrés</h1><div id="newSnippet">';
 
         echo '<table>';
         // Loop and write all the recent snippets
@@ -370,35 +757,41 @@ if (($_GET["action"] == "users")) {
 
             echo '<tr>';
             echo '<td>'.$name.'</td><td>'.$status.'</td><td>';
-            echo '<a href="action.php?action=edituser&id=' . $name . '" class="editButton">Edit</a>';
-            echo '<a href="action.php?action=deleteuser&id=' . $name . '" onclick="return confirm(\'Do you really want to delete this user ?\');" class="deleteButton">Delete</a></td></tr>';
+            echo '<a href="action.php?action=edituser&id=' . $name . '" class="editButton">Editer</a>';
+            echo '<a href="action.php?action=deleteuser&id=' . $name . '" onclick="return confirm(\'Souhaitez-vous vraiment supprimer cet utilisateur ?\');" class="deleteButton">Supprimer</a></td></tr>';
 
         }
         echo "</table><br><br>";
-        echo '<a href="action.php?action=adduser" class="addButton">Add new user</a>';
+        echo '<a href="action.php?action=adduser" class="addButton" style="width:150px !important;">Ajout utilisateur</a>';
 
         // Pagination
         // First page
-        if ($snippets_count > $limit & $page == 1) {
-            echo '<center><a href= "index.php?page=2"> Older snippets >>> </a></center>';
-        }
-        // Last page
-        if ($page > 1 & $snippets_count <= ($limit * $page) & $snippets_count > ($limit * ($page - 1))) {
-            echo '<center><a href= "index.php?page=' . ($page - 1) . '"> <<< Newer snippets </a></center>';
-        }
-        // Middle page
-        if ($page > 1 & $snippets_count > ($limit * $page)) {
-            echo '<center><a href= "index.php?page=' . ($page - 1) . '"> <<< Newer snippets</a> -- <a href="index.php?page=' . ($page + 1) . '">Older snippets >>></a></center>';
-        }
-        ?>
+        // if ($snippets_count > $limit & $page == 1) {
+        //     echo '<center><a href= "index.php?page=2"> Older snippets >>> </a></center>';
+        // }
+        // // Last page
+        // if ($page > 1 & $snippets_count <= ($limit * $page) & $snippets_count > ($limit * ($page - 1))) {
+        //     echo '<center><a href= "index.php?page=' . ($page - 1) . '"> <<< Newer snippets </a></center>';
+        // }
+        // // Middle page
+        // if ($page > 1 & $snippets_count > ($limit * $page)) {
+        //     echo '<center><a href= "index.php?page=' . ($page - 1) . '"> <<< Newer snippets</a> -- <a href="index.php?page=' . ($page + 1) . '">Older snippets >>></a></center>';
+        // }
+        // ?>
 
         </center><br><br></div></body></html>
 
-    </div>
-    </div>
-    </body>
-    </html>
-    <?php
+        </div>
+        </div>
+        </body>
+        </html>
+        <?php
+    }
+    else{
+        header("location:index.php?view=all");
+    }
+
+
 }
 
 
@@ -407,88 +800,101 @@ if (($_GET["action"] == "users")) {
 
 // Page for editing user
 if (($_GET["action"] == "edituser")) {
-    include 'admin-menu.php';
 
-    $dbname = '../snippets.sqlite';
-    $mytable = "user";
-    $base = new SQLite3($dbname);
-    $id=$_GET["id"];
-    $user_query = "SELECT * FROM $mytable WHERE username=\"".$id."\" ";
+    if($_SESSION['admin']=="admin"){
+        include 'admin-menu.php';
 
-    $resultsU = $base->query($user_query);
-    $rowU = $resultsU->fetchArray();
-    $status = $rowU["status"];
-    $username = $rowU["username"];
-    $active = $rowU["active"];
-    $email = $rowU["email"];
-    ?>
+        $dbname = '../snippets.sqlite';
+        $mytable = "user";
+        $base = new SQLite3($dbname);
+        $id=$_GET["id"];
+        $user_query = "SELECT * FROM $mytable WHERE username=\"".$id."\" ";
 
-    <h1>Edit user</h1>
+        $resultsU = $base->query($user_query);
+        $rowU = $resultsU->fetchArray();
+        $status = $rowU["status"];
+        $username = $rowU["username"];
+        $active = $rowU["active"];
+        $email = $rowU["email"];
+        ?>
 
-    <div id="newSnippet">
+        <h1>Edit user</h1>
 
-        <form action="action.php" method="post">
-            <table>
-            <tr><td width="150px">Username :</td><td> <input type="text" name="username" maxlength="30" value=<?php echo $username ?> /></td></tr>
-            <tr><td width="150px">Email :</td><td> <input type="text" name="email" maxlength="40" value=<?php echo $email ?> /></td></tr>
-            <tr><td> Role </td><td>
-            <select id="status" name="status">
-                <?php
-                if($status == "admin"){
-                    echo '<option name="isadmin" value="admin" selected>admin</option>';
-                    echo '<option name="isadmin" value="noadmin">no-admin</option>';
-                }
-                else{
-                    echo '<option name="isadmin" value="admin">admin</option>';
-                    echo '<option name="isadmin" value="noadmin" selected>no-admin</option>';
+        <div id="newSnippet">
 
-                }
-                ?>
+            <form action="action.php" method="post">
+                <table>
+                <tr><td width="150px">Nom d'utilisateur </td><td> <input type="text" name="username" maxlength="30" value=<?php echo $username ?> /></td></tr>
+                <tr><td width="150px">Email </td><td> <input type="text" name="email" maxlength="40" value=<?php echo $email ?> /></td></tr>
+                <tr><td> Role </td><td>
+                <select id="status" name="status">
+                    <?php
+                    if($status == "admin"){
+                        echo '<option name="isadmin" value="admin" selected>admin</option>';
+                        echo '<option name="isadmin" value="noadmin">no-admin</option>';
+                    }
+                    else{
+                        echo '<option name="isadmin" value="admin">admin</option>';
+                        echo '<option name="isadmin" value="noadmin" selected>no-admin</option>';
+                    }
+                    ?>
 
-            </select>
-            </td></tr>
-                <?php
-                if ($active == 1){
-                    echo '<tr><td>Active :</td><td> <input type="checkbox" name="active" checked /></td></tr>';
-                }
-                else {
-                    echo '<tr><td>Active :</td><td> <input type="checkbox" name="active" /></td></tr>';
-                }
-                ?>
-            </table>
-            </center>
-            <input name="edituser" type="hidden" />
-            <input type="submit" value="Edit user" class="installButton"/>
-        </form>
-        </div>
-        </div>
-        </body>
-        </html>
+                </select>
+                </td></tr>
+                    <?php
+                    if ($active == 1){
+                        echo '<tr><td>Actif :</td><td> <input type="checkbox" name="active" checked /></td></tr>';
+                    }
+                    else {
+                        echo '<tr><td>Actif :</td><td> <input type="checkbox" name="active" /></td></tr>';
+                    }
+                    ?>
+                </table>
+                </center>
+                <input name="edituser" type="hidden" />
+                <input type="submit" value="Mettre à jour" class="installButton"/>
+            </form>
+            </div>
+            </div>
+            </body>
+            </html>
 
-        <?php
+            <?php
 
+    }
+    else{
+        header("location:index.php?view=all");
+    }
 
 }
 
 // Edit user details
 if (isset($_POST["edituser"])) {
+    if($_SESSION['admin']=="admin"){
+        $dbname = '../snippets.sqlite';
+        $base = new SQLite3($dbname);
+        $id=$_POST["username"];
+        $isadmin=$_POST["status"];
+        $email=$_POST["email"];
 
-    $dbname = '../snippets.sqlite';
-    $base = new SQLite3($dbname);
-    $id=$_POST["username"];
-    $isadmin=$_POST["status"];
-    $email=$_POST["email"];
-    if ($_POST['active'] == "on"){
-        $query_update = "UPDATE user set active=1, status=\"".$isadmin."\", email=\"".$email."\" where username=\"".$id."\" ";
-        $results = $base->exec($query_update);
-        header("location:action.php?action=users");
-    }
-    else {
-        $query_update = "UPDATE user set active=0, status=\"".$isadmin."\", email=\"".$email."\"  where username=\"".$id."\" ";
-        $results = $base->exec($query_update);
-        header("location:action.php?action=users");
-    }
+        if ($_POST['active'] == "on"){
+            $query_update = "UPDATE user set active=1, status=\"".$isadmin."\", email=\"".$email."\" where username=\"".$id."\" ";
+            $results = $base->exec($query_update);
+            header("location:action.php?action=users");
 
+        }
+        else {
+            $query_update = "UPDATE user set active=0, status=\"".$isadmin."\", email=\"".$email."\"  where username=\"".$id."\" ";
+            $results = $base->exec($query_update);
+            header("location:action.php?action=users");
+
+        }
+
+
+    }
+    else{
+        header("location:index.php?view=all");
+    }
 }
 
 
@@ -496,36 +902,45 @@ if (isset($_POST["edituser"])) {
 
 // Page for adding new snippet
 if (($_GET["action"] == "adduser")) {
-    include 'admin-menu.php';
-    ?>
+    if($_SESSION['admin']=="admin"){
 
-    <h1>Add a new user</h1>
+        include 'admin-menu.php';
+        ?>
 
-    <div id="newSnippet">
+        <h1>Add a new user</h1>
 
-        <form action="action.php" method="post">
-            <table>
-            <tr><td width="150px">Username :</td><td> <input type="text" name="username" maxlength="30" /></td></tr>
-            <tr><td width="150px">Email :</td><td> <input type="text" name="email" maxlength="40" /></td></tr>
-            <tr><td> Role </td><td>
-            <select id="status" name="status">
-                <option value="admin">admin</option>
-                <option value="noadmin">no-admin</option>
-            </select>
-            </td></tr>
-            <tr><td>Password :</td><td> <input type="text" name="pass1" /></td></tr>
-            </table>
-            </center>
-            <input name="adduser" type="hidden" />
-            <input type="submit" value="Add user" class="installButton"/>
-        </form>
+        <div id="newSnippet">
+
+            <form action="action.php" method="post">
+                <table>
+                <tr><td width="150px">Nom d'utilisateur </td><td> <input type="text" name="username" maxlength="30" /></td></tr>
+                <tr><td width="150px">Email </td><td> <input type="text" name="email" maxlength="40" /></td></tr>
+                <tr><td> Role </td><td>
+                <select id="status" name="status">
+                    <option value="admin">admin</option>
+                    <option value="noadmin">no-admin</option>
+                </select>
+                </td></tr>
+                <tr><td>Mot de passe </td><td> <input type="password" name="pass1" /></td></tr>
+                </table>
+                </center>
+                <input name="adduser" type="hidden" />
+                <input type="submit" value="Ajouter" class="installButton"/>
+            </form>
 
 
-    </div>
-    </div>
-    </body>
-    </html>
-    <?php
+        </div>
+        </div>
+        </body>
+        </html>
+        <?php
+
+    }
+    else{
+        header("location:index.php?view=all");
+    }
+
+
 }
 
 
@@ -536,33 +951,40 @@ if (($_GET["action"] == "adduser")) {
 // Save new user to the database
 if (isset($_POST["adduser"])) {
 
-    $dbname = '../snippets.sqlite';
-    $base = new SQLite3($dbname);
+    if($_SESSION['admin']=="admin"){
 
-    // get values
-    $username = $_POST['username'];
-    $pwd = $_POST['pass1'];
-    $status = $_POST['status'];
-    $email = $_POST['email'];
+        $dbname = '../snippets.sqlite';
+        $base = new SQLite3($dbname);
 
-    $hash = hash('sha256', $pwd);
-    //creates a 3 character sequence for salt
-    function createSalt() {
-        $string = md5(uniqid(rand(), true));
-        return substr($string, 0, 3);
+        // get values
+        $username = $_POST['username'];
+        $pwd = $_POST['pass1'];
+        $status = $_POST['status'];
+        $email = $_POST['email'];
+
+        $hash = hash('sha256', $pwd);
+        //creates a 3 character sequence for salt
+        function createSalt() {
+            $string = md5(uniqid(rand(), true));
+            return substr($string, 0, 3);
+        }
+
+        $salt = createSalt();
+        $hash = hash('sha256', $salt . $hash);
+
+
+        // Add the user to the database
+        $addUser = "INSERT INTO user(username, status, password, salt, active, email)
+            VALUES ('$username', '$status' , '$hash' ,'$salt', 1, '$email')";
+        $base->exec($addUser);
+
+        // returns to the main admin page
+        header("location:action.php?action=users");
+    }
+    else{
+        header("location:index.php?view=all");
     }
 
-    $salt = createSalt();
-    $hash = hash('sha256', $salt . $hash);
-
-
-    // Add the user to the database
-    $addUser = "INSERT INTO user(username, status, password, salt, active, email)
-        VALUES ('$username', '$status' , '$hash' ,'$salt', 1, '$email')";
-    $base->exec($addUser);
-
-    // returns to the main admin page
-    header("location:action.php?action=users");
 }
 
 
@@ -595,14 +1017,14 @@ if (($_GET["action"] == "preferences")) {
 
 
 
-    echo "<h1>Preferences</h1>";
+    echo "<h1>Préferences</h1>";
     echo "<div id='newSnippet'>";
 
     // show css settings only to admins
     if ($status == "admin"){
     ?>
 
-    <h2>Change prism theme</h2>
+    <h2>Changer le thème</h2>
     <br>
         <form id="form" name="prism_theme" method="post" >
             <select name="prism_theme">
@@ -615,7 +1037,7 @@ if (($_GET["action"] == "preferences")) {
                 ?>
             </select>
             <br>
-            <input class="loginButton" type="submit" value="Change CSS" class="submit" />
+            <input class="loginButton" type="submit" value="Charger CSS" class="submit" />
         </form>
         <br>
     <hr>
@@ -630,17 +1052,17 @@ if (($_GET["action"] == "preferences")) {
     $row_pwd = $results_pwd->fetchArray()
     ?>
         <br>
-        <h2>Change password</h2>
+        <h2>Changer le mot de passe</h2>
 
         <form id="form-pwd" name="settings2" method="post" >
             <br>
             <table>
                 <tr><td width="200px">
-                        New password</td><td> <input class="login" type="password" name="password1" ></td></tr>
-                <tr><td>Re-enter new password</td><td> <input class="login" type="password" name="password2" ></td></tr>
+                        Nouveau mdp</td><td> <input class="login" type="password" name="password1" ></td></tr>
+                <tr><td>Répéter mdp</td><td> <input class="login" type="password" name="password2" ></td></tr>
             </table>
             <input name="username" type="hidden" value=" <?php echo $row_pwd['username']; ?> "/>
-            <input class="loginButton" type="submit" value="Change password" class="submit"/>
+            <input class="loginButton" type="submit" value="Changer mdp" class="submit"/>
         </form>
     </div>
     </body></html>
@@ -661,7 +1083,7 @@ if (($_GET["action"] == "preferences")) {
             $query = "UPDATE settings set prismtheme='".$_POST['prism_theme']."' ";
             $base->exec($query);
             // returns to the main admin page
-            header("location:index.php");
+            header("location:index.php?view=all");
         }
 
         if (isset($_POST['password1']) && isset($_POST['password2']) && $_POST['password1'] == $_POST['password2']) {

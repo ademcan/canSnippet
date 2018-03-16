@@ -14,10 +14,8 @@ function isLoggedIn()
 }
 ?>
 
-<html>
+<!DOCTYPE html>
     <head>
-        <link rel="icon" type="image/png" href="images/logo_bioinfofr.png">
-        <link rel="alternate" type="application/rss+xml" title="Flux RSS" href="/rss/" />
         <?php
         $dbname='snippets.sqlite';
         $base=new SQLite3($dbname);
@@ -28,11 +26,14 @@ function isLoggedIn()
         $theme = $row['theme'];
         $user = $row["username"];
         $title = $row["title"];
-
-        echo '<link rel="stylesheet" href="css/flat.css" type="text/css" media="screen" />';
         ?>
+
+        <link rel="icon" type="image/png" href="images/logo_bioinfofr.png">
+        <link rel="alternate" type="application/rss+xml" title="Flux RSS" href="/rss/" />
+        <link rel="stylesheet" href="css/flat.css" type="text/css" media="screen" />
         <meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-15">
         <link href="<?=prismTheme()?>" rel="stylesheet" />
+        <script src="js/clipboard.min.js"></script>
         <script src="js/prism.js"></script>
         <title>
             <?php echo $title; ?> prism_plugins
@@ -44,7 +45,7 @@ function isLoggedIn()
         <center>
             <img src="images/logo_bioinfofr.png" style="width:200px; height:120px;margin-top:-35px;margin-bottom:5px;padding-bottom:10px;"/>
             <img src="images/bubbles_bioinfofr.png" style="width:200px; height:40px;margin-top:-35px;margin-bottom:5px;"/>
-            <form method="POST" name="search" action="action.php" style="margin-bottom:2px;">
+            <form method="POST" name="search" action="action.php" style="margin-bottom:20px; margin-top:20px;">
             <input type="textarea" class="searchBox" name="search" placeholder="Recherche snippet par tag, titre..."/>
             </form>
         </center>
@@ -56,10 +57,10 @@ function isLoggedIn()
             {
                 echo '<hr>';
 //                echo '<br>Welcome ', $_SESSION['username'] ,' ';
-                echo '<a href="admin/index.php" class="button">';
+                echo '<a href="admin/index.php?view=all" class="button">';
                 echo 'Mon compte </a>';
                 echo '<a href="logout.php" class="logoutButton">';
-                echo 'Logout </a>';
+                echo 'Déconnexion </a>';
             }
             else
             {

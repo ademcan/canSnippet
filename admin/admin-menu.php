@@ -45,6 +45,7 @@ else {
         <meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-15">
         <link href="../<?=prismTheme()?>" rel="stylesheet" />
         <script src="../js/prism.js"></script>
+        <script src="../js/jquery-1.9.1.min.js" type="text/javascript"></script>
         <title>
             canSnippet administration
         </title>
@@ -52,21 +53,41 @@ else {
 
     <body>
         <div id="menu">
-            <?php echo 'Logged in as <b>'.$username.'</b><br>Status: <b>'.$status.'</b>'; ?>
-            <a href="index.php" class="button"> My snippets </a>
-            <a href="action.php?action=add" class="button"> New snippet </a>
+            <?php echo '<div style="padding-left:10px;"> Utilisateur: <b>'.$username.'</b><br>Statut: <b>';
+            if ($status=="noadmin"){ echo 'utilisateur</b></div>'; }
+            else {echo 'admin</b></div>'; }
+
+            ?>
+            <a href="action.php?action=add" class="green_button"> Ajouter un snippet </a>
+            <a href="index.php?view=all" class="button"> Mes snippets </a>
+
+
 
             <?php
 
             if ($status == "admin"){
-                echo '<a href="action.php?action=users" class="button"> Users </a>';
+                echo '<a href="action.php?action=allsnippets&view=all" class="admin_button"> Tous les snippets </a>';
+                echo '<a href="action.php?action=users" class="admin_button"> Utilisateurs </a>';
+                echo '<a href="action.php?action=preferences" class="admin_button"> Préférences </a>';
             }
+
+            else {
+                echo '<a href="action.php?action=preferences" class="button"> Préférences </a>';
+            }
+
             ?>
 
-            <a href="action.php?action=preferences" class="button"> Preferences </a>
+
             <hr>
-            <a href="../index.php" class="button"> Back to canSnippet </a>
-            <a href="../logout.php" class="logoutButton"> Logout </a>
+            <a href="../index.php" class="button"> Accueil canSnippet </a>
+            <a href="../logout.php" class="logoutButton"> Se déconnecter </a>
         </div>
     <div id="content">
+
+
+
+
+
+
+
 <?php } ?>

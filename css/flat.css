@@ -53,8 +53,8 @@ div#languagePanel{
 
 select {
     width:300px;
-    color: #2ecc71;
-    background: #f5f2f0;
+    color: black;
+    background: #F3F3F3;
     padding: 5px;
     font-size: 16px;
     line-height: 1;
@@ -108,7 +108,17 @@ div#newSnippet{
     margin:  30px 20px;
     padding: 20px 20px ;
     border: solid 3px;
-    border-color: #2ecc71;
+    border-color: gray;
+}
+
+input{
+    font-family: Arial;
+    font-size: 12px;
+}
+
+textarea{
+    font-family: Arial;
+    font-size: 12px;
 }
 
 input.login{
@@ -117,10 +127,20 @@ input.login{
     /*border-radius: 5px;*/
 }
 
+
+
 input.searchBox{
-    width: 70%;
+    margin-top: 50px;
+    margin-bottom: 20px;
+    width: 90%;
     margin: auto 0;
+    height: 30px;
+    text-decoration: bold;
+    border-style: solid;
+    border-width: 2px;
 }
+
+
 
 input.installButton{
     top: 20px;
@@ -186,6 +206,25 @@ a.deleteButton:hover{
     background-color: #c0392b;
 }
 
+
+
+a.greenButton{
+    display: inline-block;
+    width: 100px;
+    height: 20px;
+    box-shadow: none;
+    border-style: none;
+    background-color: rgb(78, 173, 62);
+    color: white;
+    padding-top: 4px;
+    text-align: center;
+}
+a.greenButton:hover{
+    background-color: rgb(23, 139, 41);
+}
+
+
+
 a.editButton{
     display: inline-block;
     width: 100px;
@@ -217,14 +256,60 @@ a.addButton{
 
 a.button{
     display: inline-block;
-    padding-top: 40px;
+    padding-top: 30px;
     width: 100%;
-    height:60px;
+    height:40px;
     color:black;
     border-style: none;
     margin-top: 5px;
     background-color: #F3F3F3;
     text-align: center;
+}
+
+a.button:hover{
+    color: white;
+    background-color: #999999;
+}
+
+
+
+a.admin_button{
+    display: inline-block;
+    padding-top: 30px;
+    width: 100%;
+    height:40px;
+    color:black;
+    border-style: none;
+    margin-top: 5px;
+    background-color: #F3F3F3;
+    text-align: center;
+    background-image: url("../images/lockFlat.png");
+    background-repeat: no-repeat;
+    background-position: left center;
+    background-size: 50px 50px;
+}
+
+a.admin_button:hover{
+    color: white;
+    background-color: #999999;
+}
+
+
+
+a.green_button{
+    display: inline-block;
+    padding-top: 30px;
+    width: 100%;
+    height:40px;
+    color:white;
+    border-style: none;
+    margin-top: 5px;
+    background-color:rgb(78, 173, 62) ;
+    text-align: center;
+}
+a.green_button:hover{
+    color: white;
+    background-color:rgb(23, 139, 41) ;
 }
 
 a.rssButton{
@@ -245,9 +330,9 @@ a.rssButton:hover{
 
 a.logoutButton{
     display: inline-block;
-    padding-top: 40px;
+    padding-top: 30px;
     width: 100%;
-    height:60px;
+    height:40px;
     color:white;
     border-style: none;
     margin-top: 5px;
@@ -259,10 +344,7 @@ a.logoutButton:hover{
     background-color: #c0392b;
 }
 
-a.button:hover{
-    color: white;
-    background-color: #999999;
-}
+
 
 hr{
     width:100%;
@@ -315,77 +397,56 @@ hr{
 }
 
 
-/*.rating {
-  unicode-bidi: bidi-override;
-  direction: rtl;
-}
-.rating > span {
-  display: inline-block;
-  position: relative;
-  width: 1.1em;
-}
-.rating > span:hover:before,
-.rating > span:hover ~ span:before {
-   content: "\2605";
-   position: absolute;
-}
-*/
+
+
+
+
 
 
 
 
 .rating {
-    float:left;
+    overflow: hidden;
+    display: inline-block;
 }
 
-/* :not(:checked) is a filter, so that browsers that don’t support :checked don’t
-   follow these rules. Every browser that supports :checked also supports :not(), so
-   it doesn’t make the test unnecessarily selective */
-.rating:not(:checked) > input {
-    position:absolute;
-    top:-9999px;
-    clip:rect(0,0,0,0);
+.rating-input {
+    float: right;
+    width: 16px;
+    height: 16px;
+    padding: 0;
+    margin: 0 0 0 -16px;
+    opacity: 0;
 }
 
-.rating:not(:checked) > label {
-    float:right;
-    width:1em;
-    padding:0 .1em;
-    overflow:hidden;
-    white-space:nowrap;
-    cursor:pointer;
-    font-size:130%;
-    line-height:1.2;
-    color:#ddd;
-    /*text-shadow:1px 1px #bbb, 2px 2px #666, .1em .1em .2em rgba(0,0,0,.5);*/
+/*.rating-star {
+    cursor: pointer;
+    position: relative;
+    display: block;
+    width: 16px;
+    height: 16px;
+    background: url('/samples/star-rating/star.png') 0 -16px;
 }
 
-.rating:not(:checked) > label:before {
-    content: '★ ';
+.rating-star:hover {
+    background-position: 0 0;
+}*/
+
+
+
+
+
+
+.rating-star {
+    position: relative;
+    float: right;
+    display: block;
+    width: 16px;
+    height: 16px;
+    background: url('../images/star.png') 0 -16px;
 }
 
-.rating > input:checked ~ label {
-    color: #f70;
-    /*text-shadow:1px 1px #c60, 2px 2px #940, .1em .1em .2em rgba(0,0,0,.5);*/
-}
-
-.rating:not(:checked) > label:hover,
-.rating:not(:checked) > label:hover ~ label {
-    color: gold;
-    /*text-shadow:1px 1px goldenrod, 2px 2px #B57340, .1em .1em .2em rgba(0,0,0,.5);*/
-}
-
-.rating > input:checked + label:hover,
-.rating > input:checked + label:hover ~ label,
-.rating > input:checked ~ label:hover,
-.rating > input:checked ~ label:hover ~ label,
-.rating > label:hover ~ input:checked ~ label {
-    color: #ea0;
-    /*text-shadow:1px 1px goldenrod, 2px 2px #B57340, .1em .1em .2em rgba(0,0,0,.5);*/
-}
-
-.rating > label:active {
-    position:relative;
-    /*top:2px;*/
-    /*left:2px;*/
+.rating-star:hover,
+.rating-star:hover ~ .rating-star {
+    background-position: 0 0;
 }

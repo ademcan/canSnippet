@@ -39,6 +39,11 @@ session_start();
                 </form>
 
         </div>
+        <center>
+            <br /><br />
+        <button type="button" class="homeButton" onclick='document.location.href="/";'>Accueil</button>
+        </center>
+
     </body>
 <html>
 
@@ -59,49 +64,83 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
     // ask for registration
     if($_POST['register']){
 
-
+        $email = $_POST['email2'];
         $pass1=$_POST['password1'];
         $pass2=$_POST['password2'];
 
-        if (strcmp($pass1, $pass2) !== 0){
+
+        // DO NOT ALLOW THE SAME EMAIL TWICE
+        $count_query = "SELECT count(*) AS count FROM user WHERE email=\"".$email."\" ";
+        $results_count = $base->query($count_query);
+        $row_count = $results_count->fetchArray();
+        $snippets_count = $row_count['count'];
+
+        if($snippets_count>0){
             ?>
-            <script>
-                alert("Your passwords do not match!");
-            </script>
+            <script>alert("Cette adresse email est déjà enregistré.")</script>
             <?php
+            header('Location: index.php?view=all');
         }
 
-        else {
-            $to = "ademcan@ademcan.net"; // this is your Email address
-            $from = $_POST['email2']; // this is the sender's Email address
-            $username = $_POST['username2'];
-            $subject = "Nouveau compte pour canSnippet";
-            $message = utf8_encode("Chér(e)s admins,\n\nL'utilisateur suivant souhaiterai créer un nouveau compte sur canSnippet\n\nNom d'utilisateur: ".$username."\nAdresse email: ".$from.".\n\nSi vous ne souhaitai pas activer ce compte vous pouvez ignorer cet email.\nPour valider/activer ce compte veuillez vous identifié et vous rendre dans la seciton 'Utilisateurs' de votre instance canSnippet\n\nvia canSnippet");
+        else{
 
-            $headers  = 'MIME-Version: 1.0' . "\r\n";
-            $headers .= 'Content-type: text/plain; charset=UTF-8' . "\r\n";
-            $headers .= 'From: '.$from.'' . "\r\n";
-            mail($to,$subject,$message,$headers);
-
-
-            $hash = hash('sha256', $pass1);
-            //creates a 3 character sequence for salt
-            function createSalt() {
-                $string = md5(uniqid(rand(), true));
-                return substr($string, 0, 3);
-            }
-            $salt = createSalt();
-            $hash = hash('sha256', $salt . $hash);
-            $status = "noadmin";
-            $addUser = "INSERT INTO user(username, status, password, salt, active, email) VALUES ('$username', '$status' , '$hash' ,'$salt', 0, '$from')";
-            $base->exec($addUser);
-
-            ?>
+            if (strcmp($pass1, $pass2) !== 0){
+                ?>
                 <script>
-                    location.href = '../thankyou.php';
+                    alert("Your passwords do not match!");
                 </script>
-            <?php
+                <?php
+            }
+
+            else {
+                // Send email to admins
+                $to = "ademcan@ademcan.net"; // this is your Email address
+                $from = $_POST['email2']; // this is the sender's Email address
+                $username = $_POST['username2'];
+                $username = SQLite3::escapeString($username);
+                $subject = "Nouveau compte pour canSnippet";
+                $message = utf8_encode("Chér(e)s admins,\n\nL'utilisateur suivant souhaiterai créer un nouveau compte sur canSnippet\n\nNom d'utilisateur: ".$username."\nAdresse email: ".$from.".\n\nSi vous ne souhaitai pas activer ce compte vous pouvez ignorer cet email.\nPour valider/activer ce compte veuillez vous identifié et vous rendre dans la seciton 'Utilisateurs' de votre instance canSnippet\n\nvia canSnippet");
+
+                $headers  = 'MIME-Version: 1.0' . "\r\n";
+                $headers .= 'Content-type: text/plain; charset=UTF-8' . "\r\n";
+                $headers .= 'From: '.$from.'' . "\r\n";
+                mail($to,$subject,$message,$headers);
+
+                $hash = hash('sha256', $pass1);
+                //creates a 3 character sequence for salt
+                function createSalt() {
+                    $string = md5(uniqid(rand(), true));
+                    return substr($string, 0, 3);
+                }
+                $salt = createSalt();
+                $hash = hash('sha256', $salt . $hash);
+                $status = "noadmin";
+                $addUser = "INSERT INTO user(username, status, password, salt, active, email) VALUES ('$username', '$status' , '$hash' ,'$salt', 0, '$from')";
+                $base->exec($addUser);
+
+                // Send email to user
+                $to = $_POST['email2']; // this is your Email address
+                $from = "staff@bioinfo-fr.net"; // this is the sender's Email address
+                $username = $_POST['username2'];
+                $username = SQLite3::escapeString($username);
+                $subject = "Nouveau compte pour canSnippet";
+                $message = utf8_encode("Nous vous remercions pour la création d'un compet sur canSnippet. Votre compte sera validé sous peu.\n\n Bioinfo-fr admins.");
+
+                $headers  = 'MIME-Version: 1.0' . "\r\n";
+                $headers .= 'Content-type: text/plain; charset=UTF-8' . "\r\n";
+                $headers .= 'From: '.$from.'' . "\r\n";
+                mail($to,$subject,$message,$headers);
+
+
+
+                ?>
+                    <script>
+                        location.href = '../thankyou.php';
+                    </script>
+                <?php
+            }
         }
+
     }
     // Login
     else{
@@ -109,14 +148,14 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
         $password = $_POST['password'];
         //connect to the database here
         $username = SQLite3::escapeString($username);
-        $query = "SELECT password, salt, active
+        $query = "SELECT password, salt, active, status
                 FROM user
                 WHERE username = '$username';";
         $result = $base-> query($query);
 
         if( !$result ) //no such user exists
         {
-            header('Location: index.php');
+            header('Location: index.php?view=all');
         }
 
         $userData = $result->fetchArray();
@@ -128,34 +167,32 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
             ?>
                 <script>
                     alert("Wrong Username or Password !");
-                    location.href = 'index.php';
+                    location.href = 'index.php?view=all';
                 </script>
             <?php
         }
-        //login successful
+        // correct pwd
         else
         {
-
-            if( $userData['password'] != 1)
+            if( $userData['active'] != 1)
             {
                 ?>
                     <script>
-                        alert("Your account has been inactiated. Please contact the admins!");
-                        location.href = 'index.php';
+                        alert("Your account has been inactivated. Please contact the admins!");
+                        location.href = 'index.php?view=all';
                     </script>
                 <?php
             }
             else{
+                $_SESSION['admin'] = $userData['status'];
                 $_SESSION['valid'] = 1;
                 $_SESSION['username'] = $username;
                 ?>
                     <script>
-                        location.href = '../admin/index.php';
+                        location.href = '../admin/index.php?view=all';
                     </script>
                 <?php
             }
-
-
         }
 
     }

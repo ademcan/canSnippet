@@ -67,7 +67,7 @@ if (file_exists($config["dbname"])) {
                     password VARCHAR(64) NOT NULL,
                     salt VARCHAR(3) NOT NULL,
                     active integer,
-                    email VARCHAR(30) NOT NULL
+                    email VARCHAR(30) NOT NULL UNIQUE
                 )";
             $results = $base->exec($query);
 
