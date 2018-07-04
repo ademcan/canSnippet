@@ -57,7 +57,7 @@ document.getElementById("selectLanguage").onchange = function(){
     };
     xhr.open("POST", "action.php", true);
     xhr.setRequestHeader("Content-Type", "application/x-www-form-urlencoded");
-    xhr.send("language="+selectedLanguage+"&action=getname");
+    xhr.send("language="+encodeURIComponent(selectedLanguage)+"&action=getname");
 };
 </script>
     <div id="namePanel">
