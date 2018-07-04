@@ -523,6 +523,7 @@ if (isset($_POST["add"])) {
     $highlight = $_POST['highlight'];
     // $date = date("F j, Y - H:i");
     $date = date("Y-m-d");
+    $date = date("Y-m-d-h-i-s");
     // connect to the database
     $mytable = "snippets";
     $base = new SQLite3("../".$config['dbname']);
@@ -538,7 +539,7 @@ if (isset($_POST["add"])) {
     $tags = str_replace($search, $replace, $tags);
 
     $query = "INSERT INTO $mytable(username, language, name, description, code, private, lines, highlight, date, tags, score, rate_counter)
-                    VALUES ('$username', '$language', '$name', '$description', '$code', '$private', '$lines','$highlight' , '$date', '$tags', 0,0 )";
+                    VALUES ('$username', '$language', '$name', '$description', '$code', '$private', '$lines','$highlight' , '$dateDb', '$tags', 0,0 )";
     $results = $base->exec($query);
 
     // save the tags to the tags database
