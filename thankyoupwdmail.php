@@ -4,7 +4,7 @@
 /*
   @author: Ademcan (ademcan@ademcan.net)
   @name: thankyou.php
-  @description: Account creation successfull
+  @description: successffull password renewal
  */
 
  require_once("./config.php");
@@ -18,10 +18,13 @@
          require("./fr.php");
          break;
  }
+
 ?>
+
 
 <html>
 <head>
+    <link rel="icon" type="image/jpg" href="images/favicon.png">
     <link rel="stylesheet" href="css/flat.css" type="text/css" media="screen" />
 </head>
 <body>
@@ -29,15 +32,11 @@
         <img src="images/canSnippetLogo_CE_200x200_new.png" style="width:200px;padding-top:50px;"/><br />
     <div style="">
         <br /><br />
-        <?php echo($messages['accountcreationreceived']); ?>
-        <br />
-        <?php echo($messages['accountcreationreceived2']); ?>
-        <br /><br />
-        <button type="button" class="homeButton" onclick='document.location.href="/";'><?php echo($messages['home']); ?></button>
+        <?php echo($messages['successfullnewpwdmail']); ?><br /><br />
+        <button type="button" class="homeButton" onclick='document.location.href="admin/login.php";'><?php echo($messages['connect']); ?></button>
     </div>
 
     </center>
-
 
 </body>
 

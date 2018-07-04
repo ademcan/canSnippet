@@ -12,8 +12,17 @@ if (!isset($_SESSION))
     session_start();
 
 require_once('../config.php');
+$lng = language();
+switch ($lng) {
+    case "en":
+        require("../en.php");
+        break;
+    case "fr":
+        require("../fr.php");
+        break;
+}
 
-// we block the acces to no authenticated people
+// we block the acces to non-authenticated people
 if (!isset($_SESSION['valid']) || !$_SESSION['valid']) {
     header("location:login.php");
 }
@@ -41,8 +50,8 @@ else {
         $themeT = $rowT['theme'];
         echo '<link rel="stylesheet" href="../css/flat.css" type="text/css" media="screen" />';
         ?>
-        <link rel="icon" type="image/jpg" href="../images/canLogo.jpg">
-        <meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-15">
+        <link rel="icon" type="image/jpg" href="../images/favicon.png">
+        <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
         <link href="../<?=prismTheme()?>" rel="stylesheet" />
         <script src="../js/prism.js"></script>
         <script src="../js/jquery-1.9.1.min.js" type="text/javascript"></script>
@@ -53,41 +62,26 @@ else {
 
     <body>
         <div id="menu">
-            <?php echo '<div style="padding-left:10px;"> Utilisateur: <b>'.$username.'</b><br>Statut: <b>';
+            <font style="color:white;"><?php echo '<div style="padding-left:10px;"> '.$messages['user'].' : <b>'.$username.'</b><br>'.$messages['status'].': <b>';
             if ($status=="noadmin"){ echo 'utilisateur</b></div>'; }
             else {echo 'admin</b></div>'; }
-
-            ?>
-            <a href="action.php?action=add" class="green_button"> Ajouter un snippet </a>
-            <a href="index.php?view=all" class="button"> Mes snippets </a>
-
-
-
+            ?></font>
+            <a href="action.php?action=add" class="green_button"> <?php echo($messages['addsnippet']); ?> </a>
+            <a href="index.php?view=all" class="button"> <?php echo($messages['mysnippets']); ?> </a>
             <?php
-
             if ($status == "admin"){
-                echo '<a href="action.php?action=allsnippets&view=all" class="admin_button"> Tous les snippets </a>';
-                echo '<a href="action.php?action=users" class="admin_button"> Utilisateurs </a>';
-                echo '<a href="action.php?action=preferences" class="admin_button"> Préférences </a>';
+                echo '<a href="action.php?action=allsnippets&view=all" class="admin_button"> '.$messages['allsnippets'].' </a>';
+                echo '<a href="action.php?action=users" class="admin_button"> '.$messages['users'].' </a>';
+                echo '<a href="action.php?action=preferences" class="admin_button"> '.$messages['preferences'].' </a>';
             }
-
             else {
                 echo '<a href="action.php?action=preferences" class="button"> Préférences </a>';
             }
-
             ?>
-
-
             <hr>
-            <a href="../index.php" class="button"> Accueil canSnippet </a>
-            <a href="../logout.php" class="logoutButton"> Se déconnecter </a>
+            <a href="../index.php" class="button"> <?php echo($messages['cansnippethome']); ?> </a>
+            <a href="../logout.php" class="logoutButton"> <?php echo($messages['deconnection']); ?> </a>
         </div>
     <div id="content">
-
-
-
-
-
-
 
 <?php } ?>

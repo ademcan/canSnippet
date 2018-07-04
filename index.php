@@ -4,9 +4,22 @@
     @name: index.php
     @description: initial page
     */
-    include "config.php";
-    session_start();
 
+    include "config.php";
+    $lng = language();
+
+    switch ($lng) {
+        case "en":
+            require("./en.php");
+            break;
+        case "fr":
+            require("./fr.php");
+            break;
+    }
+
+    date_default_timezone_set("UTC");
+    session_start();
+    // date_default_timezone_set("UTC");
     if (!file_exists("snippets.sqlite")) {
         echo "<script>location.href='install.php';</script>";
     } else {
@@ -65,7 +78,7 @@
     echo '<h1>{ '.$title.' }</h1>';
 
     if($snippets_count == 0){
-        echo "Il n'y a pas de snippets pour le moment. Vous pouvez ajouter un nouveau snippet depuis votre compte.";
+        echo $messages['nosnippetyet'];
     }
 
     // Loop and write all the recent snippets
@@ -84,7 +97,7 @@
         $rate_counter = $row['rate_counter'];
         $score = $row['score'];
 
-        echo '<br><div style="margin-bottom:5px;display:inline-flex;"><h2><a href="details.php?id='.$id.'">'.$name.'</a> ['.$language.'] </h2><button style="background-color:transparent; border-color:transparent;" class="btn" id="btn" data-clipboard-text="'.$code.'"><img src="images/copy.png" style="height:25px;" alt="Copy to clipboard"></button></div>';
+        echo '<div style="margin-bottom:5px;padding-top:20px;display:inline-flex;word-break: break-all;"><h2><a href="details.php?id='.$id.'">'.$name.'</a> ['.$language.'] </h2><button style="background-color:transparent; border-color:transparent;" class="btn" id="btn" data-clipboard-text="'.$code.'" title="Copy to clipboard"><img src="images/copy.png" style="height:25px;"></button></div>';
 
         if ($language=="html"){
             $languageClass = "language-markup";
@@ -108,9 +121,10 @@
             // $lowtag = strtolower($var);
             // $lowtag = str_replace(' ', '', $var);
 
-            $lowtag=trim($var);
+            // $lowtag=trim($var);
+            $lowtag = str_replace(' ', '', $var);
             if ($lowtag == ""){
-                echo 'Aucun tag&nbsp;';
+                echo $messages['notag'],'&nbsp;';
             }
             else{
                 echo '<a href="tags.php?tag='.rawurlencode($lowtag).'" style="color:black;text-decoration:underline">'.$lowtag.'</a>&nbsp;';
@@ -127,10 +141,6 @@
 
         echo '<section class="'.$languageClass.'"> <pre class="line-numbers "'.(($highlight!="")?" data-line=\"$highlight\"":"").'><code>'.$code.'</code></pre> </section>';
 
-
-
-
-        // if(isset($_SESSION['valid']) && $_SESSION['valid']){
         if (isLoggedIn()){
             if (!in_array($id, $score_array)){
                 echo '<span class="rating" id="rating_div'.$id.'">
@@ -155,10 +165,10 @@
         echo '<div id="scores'.$id.'"><b> '.$score.'</b>/5 - ['.$rate_counter.' ';
 
         if ($rate_counter < 2){
-            echo ' rating] </div>';
+            echo ' ',$messages['rating'],'] </div>';
         }
         else {
-            echo ' ratings] </div>';
+            echo ' ',$messages['ratings'],'] </div>';
         }
         echo '<br><hr ><br>';
     }
@@ -172,13 +182,13 @@
     }
     // Last page
     if($page > 1 & $snippets_count <= ($limit*$page) & $snippets_count > ($limit*($page-1)) ){
-        echo '<center><a href= "index.php?page='.($page-1).'"> <<< Snippets récents </a></center>';
+        echo '<center><a href= "index.php?page='.($page-1).'"> <<< ',$messages['oldersnippets'],' </a></center>';
     }
     // Middle page
     if($page > 1 & $snippets_count > ($limit*$page)){
-        echo '<center><a href= "index.php?page='.($page-1).'"> <<< Snippets récents</a> -- <a href="index.php?page='.($page+1).'">Ancients snippets >>></a></center>';
+        echo '<center><a href= "index.php?page='.($page-1).'"> <<< ',$messages['newestsnippets'],'</a> -- <a href="index.php?page='.($page+1).'">Ancients snippets >>></a></center>';
     }
-    echo '<center><font size="1">Powered by <a href="http://www.ademcan.net/index.php?d=2014/01/16/08/47/25-save-and-share-your-snippets-with-cansnippet">canSnippet</a> v1.0 beta - by ademcan<font></center>';
+    echo '<center><font size="3">Powered by <a href="https://www.cansnippet.org/">canSnippet</a> CE - by <a href="https://ademcan.net/">ademcan</a><font></center>';
     echo '<br></div> </body></html>';
     }
     echo '';

@@ -15,7 +15,7 @@ if (file_exists($config["dbname"])) {
 <head>
     <link rel="stylesheet" href="css/flat.css" type="text/css" media="screen" />
     <title>
-        Installation of canSnippets
+        Installation of canSnippet
     </title>
 </head>
 <html>
@@ -30,7 +30,7 @@ if (file_exists($config["dbname"])) {
                 <tr><td>Username :</td><td> <input type="text" name="username" maxlength="30" /></td></tr>
                 <tr><td>Email :</td><td> <input type="email" name="email" maxlength="30" /></td></tr>
                 <tr><td>Password :</td><td> <input type="password" name="pass1" /></td></tr>
-                <tr><td>Password Again :</td><td> <input type="password" name="pass2" /></td></tr>
+                <tr><td>Repeat Password :</td><td> <input type="password" name="pass2" /></td></tr>
                 </table>
                 </center>
 
@@ -134,7 +134,9 @@ if (file_exists($config["dbname"])) {
                 username longtext,
                 title longtext,
                 theme longtext,
-                prismtheme longtext
+                prismtheme longtext,
+                email longtext,
+                lng longtext
                 )";
             $base->exec($createSettingsDatabase);
 
@@ -146,9 +148,21 @@ if (file_exists($config["dbname"])) {
                 )";
             $base->exec($createTagsDatabase);
 
+
+            // Create Pwd reset (token) table
+            $createPwdtokenDatabase = "CREATE TABLE pwdtoken(
+                ID INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,
+                email longtext,
+                token longtext,
+                timestamp date
+                )";
+            $base->exec($createPwdtokenDatabase);
+
+
+
             // Add default settings to database
-            $addDefaultSettings = "INSERT INTO settings(username, title, theme, prismtheme)
-                VALUES ('$username' , '$title', 'flat', '".$config["defaultPrismCSS"]."')";
+            $addDefaultSettings = "INSERT INTO settings(username, title, theme, prismtheme, email, lng)
+                VALUES ('$username' , '$title', 'flat', '".$config["defaultPrismCSS"]."', '$email', 'en')";
             $base->exec($addDefaultSettings);
 
             ?>

@@ -5,24 +5,30 @@
   @description: index page for the admin panel
  */
 
- ini_set('display_errors', 'On');
- error_reporting(E_ALL);
+ // ini_set('display_errors', 'On');
+ // error_reporting(E_ALL);
 
 session_start();
+// date_default_timezone_set("UTC");
 
-if (isset($_SESSION['valid']) && $_SESSION['valid']) {
+if (!isset($_SESSION['valid']) || !$_SESSION['valid']) {
+    header("location:login.php");
+}
+
+else {
     // CONNECTION TO THE DATABASE
     include 'admin-menu.php';
     $dbname = '../snippets.sqlite';
     $mytable = "snippets";
     $base = new SQLite3($dbname);
 
-    // $count_query = "SELECT count(*) as count FROM $mytable";
-    // $results_count = $base->query($count_query);
-    // $row_count = $results_count->fetchArray();
-    // $snippets_count = $row_count['count'];
+    if(isset($_GET['view']) ){
+        $view = $_GET['view'];
+    } else {
+        $view = "all";
+    }
 
-    $view = $_GET['view'];
+
     if ($view == "all"){
         $count_query = "SELECT count(*) as count FROM $mytable WHERE username=\"".$username."\"";
         $results_count = $base->query($count_query);
@@ -51,25 +57,10 @@ if (isset($_SESSION['valid']) && $_SESSION['valid']) {
 
     $username = $_SESSION['username'];
 
-
     $queryU = "SELECT * FROM user WHERE username=\"".$username."\" ";
     $resultsU = $base->query($queryU);
     $rowU = $resultsU->fetchArray();
     $status = $rowU["status"];
-
-
-    // if ($status == "admin"){
-    //     // If admin, show all the snippets
-    //     $query_name = "SELECT * FROM $mytable ORDER BY date ASC LIMIT $start_count,$limit";
-    //     $title = "All snippets";
-    // }
-    // else {
-    //     // If not admin show only user's snippets
-    //
-    // }
-
-
-
 
     if ($view == "all"){
         $query_name = "SELECT * FROM $mytable WHERE username=\"".$username."\" ORDER BY date DESC LIMIT $start_count,$limit";
@@ -81,11 +72,7 @@ if (isset($_SESSION['valid']) && $_SESSION['valid']) {
         $query_name = "SELECT * FROM $mytable WHERE username=\"".$username."\" AND private='on' ORDER BY date DESC LIMIT $start_count,$limit";
     }
 
-    // $query_name = "SELECT * FROM $mytable WHERE username=\"".$username."\" ORDER BY date DESC LIMIT $start_count,$limit";
-
-
-
-    $title = "Mes snippets (".$snippets_count.")";
+    $title = $messages['mysnippets']." (".$snippets_count.")";
 
     $results_name = $base->query($query_name);
 
@@ -102,16 +89,13 @@ if (isset($_SESSION['valid']) && $_SESSION['valid']) {
         }
     }
 
-
-
     echo '<h1>'.$title.'</h1>';
-
-    echo '<div style="margin-left:20px;"><b>Visualiser</b> : <a href="index.php?view=all" class="editButton" style="margin-right:10px !important; ">Tous</a>';
-    echo '<a href="index.php?view=public" class="greenButton" style="margin-right:10px !important; ">Actifs</a>';
-    echo '<a href="index.php?view=private" class="deleteButton">Inactifs</a></div><div id="newSnippet">';
+    echo '<div><b>'.$messages['show'].'</b>  <a href="index.php?view=all" class="editButton" style="margin-right:10px !important; ">'.$messages['all'].'</a>';
+    echo '<a href="index.php?view=public" class="greenButton" style="margin-right:10px !important; ">'.$messages['published'].'</a>';
+    echo '<a href="index.php?view=private" class="deleteButton">'.$messages['unpublished'].'</a></div><div id="newSnippet">';
 
     if ($snippets_count == 0){
-        echo "Vous n'avez pas encore de snippets. Utilisez le menu 'Ajouter un snippet' pour commencer.";
+        echo "".$messages['nosnippetyet']."";
     }
 
     // Loop and write all the recent snippets
@@ -130,12 +114,23 @@ if (isset($_SESSION['valid']) && $_SESSION['valid']) {
 
         $id = $row['ID'];
 
-        if ($private=="on"){
-            echo '<div style="background-color:#BDEDFF;margin-top:20px;"><h2><font color="#27ae60">'.$name.' ['.$language.']</font><a href="action.php?action=activate&id=' . $row['ID'] . '" onclick="return confirm(\'Souhaitez-vous vraiment activer ce snippet ?\');"><img src="../images/lockFlat.png" style="width:20px; height: 20px;padding-left:10px;" /></a></h2>';
+        if ($status == "admin"){
+            if ($private=="on"){
+                echo '<div style="background-color:#BDEDFF;margin-top:20px;"><h2><font color="#27ae60">'.$name.' ['.$language.']</font><a href="action.php?action=activate&id=' . $row['ID'] . '" onclick="return confirm(\'',$messages['reallyactivatesnippet'],'\');"><img src="../images/lockFlat.png" style="width:20px; height: 20px;padding-left:10px;" /></a></h2>';
+            }
+            else {
+                echo '<div style="margin-top:20px;"><h2><font color="#27ae60">'.$name.' ['.$language.']</font><a href="action.php?action=deactivate&id=' . $row['ID'] . '" onclick="return confirm(\'',$messages['reallydeactivatesnippet'],'\');"><img src="../images/lockFlat_open.png" style="width:20px; height: 20px;padding-left:10px;" /></a></h2>';
+                // echo '<div style="margin-top:20px;"><h2><font color="#27ae60">'.$name.' ['.$language.']</font></h2>';
+            }
         }
         else {
-            echo '<div style="margin-top:20px;"><h2><font color="#27ae60">'.$name.' ['.$language.']</font><a href="action.php?action=deactivate&id=' . $row['ID'] . '" onclick="return confirm(\'Souhaitez-vous vraiment désactiver ce snippet ?\');"><img src="../images/lockFlat_open.png" style="width:20px; height: 20px;padding-left:10px;" /></a></h2>';
-            // echo '<div style="margin-top:20px;"><h2><font color="#27ae60">'.$name.' ['.$language.']</font></h2>';
+            if ($private=="on"){
+                echo '<div style="background-color:#BDEDFF;margin-top:20px;"><h2><font color="#27ae60">'.$name.' ['.$language.']</font><img src="../images/lockFlat.png" style="width:20px; height: 20px;padding-left:10px;" /></h2>';
+            }
+            else {
+                echo '<div style="margin-top:20px;"><h2><font color="#27ae60">'.$name.' ['.$language.']</font><img src="../images/lockFlat_open.png" style="width:20px; height: 20px;padding-left:10px;" /></h2>';
+                // echo '<div style="margin-top:20px;"><h2><font color="#27ae60">'.$name.' ['.$language.']</font></h2>';
+            }
         }
 
 
@@ -171,8 +166,8 @@ if (isset($_SESSION['valid']) && $_SESSION['valid']) {
         }
         echo '</div>';
         echo '<section class="'.$languageClass.'"> <pre class="line-numbers"><code>'.$code.'</code></pre> </section>';
-        echo '<a href="action.php?action=edit&id=' . $row['ID'] . '" class="editButton">Editer</a>';
-        echo '<a href="action.php?action=delete&id=' . $row['ID'] . '" onclick="return confirm(\'Souhaitez-vous vraiment supprimer ce snippet ?\');" class="deleteButton">Supprimer</a>';
+        echo '<a href="action.php?action=edit&id=' . $row['ID'] . '" class="editButton">'.$messages['edit'].'</a>';
+        echo '<a href="action.php?action=delete&id=' . $row['ID'] . '" onclick="return confirm(\'',$messages['reallydeletesnippet'],'\');" class="deleteButton">'.$messages['delete'].'</a>';
         echo '<hr><br></div>';
     }
 
@@ -181,22 +176,20 @@ if (isset($_SESSION['valid']) && $_SESSION['valid']) {
     // Pagination
     // First page
     if ($snippets_count > $limit & $page == 1) {
-        echo '<center><a href= "index.php?view='.$view.'&page=2"> Anciens snippets >>> </a></center>';
+        echo '<center><a href= "index.php?view='.$view.'&page=2"> '.$messages['oldersnippets'].' >>> </a></center>';
     }
     // Last page
     if ($page > 1 & $snippets_count <= ($limit * $page) & $snippets_count > ($limit * ($page - 1))) {
-        echo '<center><a href= "index.php?view='.$view.'&page=' . ($page - 1) . '"> <<< Snippets récents </a></center>';
+        echo '<center><a href= "index.php?view='.$view.'&page=' . ($page - 1) . '"> <<< '.$messages['newestsnippets'].' </a></center>';
     }
     // Middle page
     if ($page > 1 & $snippets_count > ($limit * $page)) {
-        echo '<center><a href= "index.php?view='.$view.'&page=' . ($page - 1) . '"> <<< Snippets récents</a> -- <a href="index.php?page=' . ($page + 1) . '">Older snippets >>></a></center>';
+        echo '<center><a href= "index.php?view='.$view.'&page=' . ($page - 1) . '"> <<< '.$messages['newestsnippets'].'</a> -- <a href="index.php?page=' . ($page + 1) . '">Older snippets >>></a></center>';
     }
     ?>
 
     </center><br><br></div></body></html>
 
-            <?php
-        } else {
-            header("location:login.php");
-        }
-    ?>
+    <?php
+}
+?>

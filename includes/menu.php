@@ -5,6 +5,17 @@
 @description: menu for the user interface
 */
 require_once("./config.php");
+$lng = language();
+
+switch ($lng) {
+    case "en":
+        require("./en.php");
+        break;
+    case "fr":
+        require("./fr.php");
+        break;
+}
+
 
 function isLoggedIn()
 {
@@ -15,59 +26,56 @@ function isLoggedIn()
 ?>
 
 <!DOCTYPE html>
-    <head>
-        <?php
-        $dbname='snippets.sqlite';
-        $base=new SQLite3($dbname);
+<head>
+    <?php
+    $dbname='snippets.sqlite';
+    $base=new SQLite3($dbname);
 
-        $query_name = "SELECT * FROM settings ";
-        $results_name = $base->query($query_name);
-        $row = $results_name->fetchArray();
-        $theme = $row['theme'];
-        $user = $row["username"];
-        $title = $row["title"];
-        ?>
+    $query_name = "SELECT * FROM settings ";
+    $results_name = $base->query($query_name);
+    $row = $results_name->fetchArray();
+    $theme = $row['theme'];
+    $user = $row["username"];
+    $title = $row["title"];
+    ?>
+    <link rel="icon" type="image/png" href="images/favicon.png">
+    <link rel="alternate" type="application/rss+xml" title="Flux RSS" href="/rss/" />
+    <link rel="stylesheet" href="css/flat.css" type="text/css" media="screen" />
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+    <link href="<?=prismTheme()?>" rel="stylesheet" />
+    <script src="js/clipboard.min.js"></script>
+    <script src="js/prism.js"></script>
+    <title>
+        <?php echo $title; ?> prism_plugins
+    </title>
+</head>
 
-        <link rel="icon" type="image/png" href="images/logo_bioinfofr.png">
-        <link rel="alternate" type="application/rss+xml" title="Flux RSS" href="/rss/" />
-        <link rel="stylesheet" href="css/flat.css" type="text/css" media="screen" />
-        <meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-15">
-        <link href="<?=prismTheme()?>" rel="stylesheet" />
-        <script src="js/clipboard.min.js"></script>
-        <script src="js/prism.js"></script>
-        <title>
-            <?php echo $title; ?> prism_plugins
-        </title>
-    </head>
+<body>
+    <div id="menu">
+    <center>
+        <img src="images/canSnippetLogo_CE_light.png" style="width:100px; height:90px;margin-bottom:5px;padding-top:10px;"/>
+        <form method="POST" name="search" action="action.php" style="margin-bottom:20px; margin-top:20px;">
+        <input type="textarea" class="searchBox" name="search" placeholder="<?php echo ($messages['searchboxtext']); ?>" />
+        </form>
+    </center>
+    <a href="index.php" class="button"><?php echo($messages['home']); ?></a>
+    <a href="browse.php" class="button"><?php echo($messages['search']); ?></a>
+    <a href="rss/" class="button"><?php echo($messages['rss']); ?></a>
+    <?php
+        if(isLoggedIn())
+        {
+            echo '<hr>';
+            echo '<a href="admin/index.php?view=all" class="button">';
+            echo $messages['myaccount'],' </a>';
+            echo '<a href="logout.php" class="logoutButton">';
+            echo $messages['deconnection'],'</a>';
+        }
+        else
+        {
+            echo '<a href="admin/login.php" class="button">';
+            echo $messages['identification'],'</a> ';
+        }
+    ?>
 
-    <body>
-        <div id="menu">
-        <center>
-            <img src="images/logo_bioinfofr.png" style="width:200px; height:120px;margin-top:-35px;margin-bottom:5px;padding-bottom:10px;"/>
-            <img src="images/bubbles_bioinfofr.png" style="width:200px; height:40px;margin-top:-35px;margin-bottom:5px;"/>
-            <form method="POST" name="search" action="action.php" style="margin-bottom:20px; margin-top:20px;">
-            <input type="textarea" class="searchBox" name="search" placeholder="Recherche snippet par tag, titre..."/>
-            </form>
-        </center>
-        <a href="index.php" class="button"> Accueil </a>
-        <a href="browse.php" class="button"> Recherche </a>
-        <a href="rss/" class="button">RSS </a>
-        <?php
-            if(isLoggedIn())
-            {
-                echo '<hr>';
-//                echo '<br>Welcome ', $_SESSION['username'] ,' ';
-                echo '<a href="admin/index.php?view=all" class="button">';
-                echo 'Mon compte </a>';
-                echo '<a href="logout.php" class="logoutButton">';
-                echo 'Déconnexion </a>';
-            }
-            else
-            {
-                echo '<a href="admin/login.php" class="button">';
-                echo ' Identification / Nouveau compte </a> ';
-            }
-        ?>
-
-        </div>
-        <div id="content">
+    </div>
+    <div id="content">

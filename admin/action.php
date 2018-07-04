@@ -14,6 +14,8 @@ ini_set('display_startup_errors', 1);
 ini_set('display_errors', 1);
 error_reporting(-1);
 
+
+
 require_once('../config.php');
 if (!isset($_SESSION))
     session_start();
@@ -54,9 +56,6 @@ if (($_GET["action"] == "delete")) {
     header("location:index.php?view=all");
 }
 
-
-
-
 // Activate a snippet based on its identifier
 if (($_GET["action"] == "activate")) {
     // connection to the database
@@ -79,23 +78,39 @@ if (($_GET["action"] == "deactivate")) {
     header("location:index.php?view=all");
 }
 
-
-
-
+// Delete a user
 if (($_GET["action"] == "deleteuser")) {
     $dbname = '../snippets.sqlite';
     $base = new SQLite3($dbname);
-    // sql command to delete the user
     $username = $_GET["id"];
-    $query_name = "DELETE FROM user WHERE username=\"".$username."\" ";
-    $results_name = $base->query($query_name);
-    header("location:action.php?action=users");
+    // sql command to delete the user
+    $queryU = "SELECT * FROM user WHERE username=\"".$username."\" ";
+    $resultsU = $base->query($queryU);
+    $rowU = $resultsU->fetchArray();
+    $status = $rowU["status"];
+
+    // if user is admin, check that it is not the last admin
+    if ($status == "admin"){
+        // check that it is not the last admin user
+        $count_query = "SELECT count(*) as count FROM user WHERE status='admin'";
+        $results_count = $base->query($count_query);
+        $row_count = $results_count->fetchArray();
+        $user_count = $row_count['count'];
+        if ($user_count > 1){
+            $query_name = "DELETE FROM user WHERE username=\"".$username."\" ";
+            $results_name = $base->query($query_name);
+            header("location:action.php?action=users");
+        }
+    }
+    // delete directly if user is not admin
+    else {
+        $query_name = "DELETE FROM user WHERE username=\"".$username."\" ";
+        $results_name = $base->query($query_name);
+        header("location:action.php?action=users");
+    }
 }
 
-
-
-
-
+// Show all snippets
 if (($_GET["action"] == "allsnippets")) {
     $dbname = '../snippets.sqlite';
     $mytable = "snippets";
@@ -103,9 +118,6 @@ if (($_GET["action"] == "allsnippets")) {
 
     // $count_query = "SELECT count(*) as count FROM $mytable";
     // $results_count = $base->query($count_query);
-
-
-
     $view = $_GET['view'];
 
     if ($view == "all"){
@@ -165,19 +177,18 @@ if (($_GET["action"] == "allsnippets")) {
     // $query_name = "SELECT * FROM $mytable ORDER BY date DESC LIMIT $start_count,$limit";
 
 
-    $title = "Tous les snippets (".$snippets_count.")";
+    $title = $messages['allsnippets']." (".$snippets_count.")";
 
     $results_name = $base->query($query_name);
 
     echo '<h1>'.$title.'</h1>';
-
-    echo '<div style="margin-left:20px;"><b>Visualiser</b> : <a href="action.php?action=allsnippets&view=all" class="editButton" style="margin-right:10px !important; ">Tous</a>';
-    echo '<a href="action.php?action=allsnippets&view=public" class="greenButton" style="margin-right:10px !important; ">Actifs</a>';
-    echo '<a href="action.php?action=allsnippets&view=private" class="deleteButton">Inactifs</a></div><div id="newSnippet">';
+    echo '<div><b>'.$messages['show'].'</b>  <a href="index.php?view=all" class="editButton" style="margin-right:10px !important; ">'.$messages['all'].'</a>';
+    echo '<a href="index.php?view=public" class="greenButton" style="margin-right:10px !important; ">'.$messages['published'].'</a>';
+    echo '<a href="index.php?view=private" class="deleteButton">'.$messages['unpublished'].'</a></div><div id="newSnippet">';
 
 
     if ($snippets_count == 0){
-        echo "You don't have any snippet yet, you can add new snippets from 'New snippet' menu.";
+        echo "".$messages['nosnippetyet']."";
     }
 
     // Loop and write all the recent snippets
@@ -200,7 +211,7 @@ if (($_GET["action"] == "allsnippets")) {
             echo '<div style="background-color:#BDEDFF;margin-top:20px;"><h2><font color="#27ae60">'.$name.' ['.$language.']</font><a href="action.php?action=activate&id=' . $row['ID'] . '" onclick="return confirm(\'Do you really want to activate this snippet ?\');"><img src="../images/lockFlat.png" style="width:20px; height: 20px;padding-left:10px;" /></a></h2>';
         }
         else {
-            echo '<div style="margin-top:20px;"><h2><font color="#27ae60">'.$name.' ['.$language.']</font><a href="action.php?action=deactivate&id=' . $row['ID'] . '" onclick="return confirm(\'Do you really want to de-activate this snippet ?\');"><img src="../images/lockFlat_open.png" style="width:20px; height: 20px;padding-left:10px;" /></a></h2>';
+            echo '<div style="margin-top:20px;"><h2><font color="#27ae60">'.$name.' ['.$language.']</font><a href="action.php?action=deactivate&id=' . $row['ID'] . '" onclick="return confirm(\'Do you really want to deactivate this snippet ?\');"><img src="../images/lockFlat_open.png" style="width:20px; height: 20px;padding-left:10px;" /></a></h2>';
             // echo '<div style="margin-top:20px;"><h2><font color="#27ae60">'.$name.' ['.$language.']</font></h2>';
         }
 
@@ -244,8 +255,8 @@ if (($_GET["action"] == "allsnippets")) {
         }
         echo '</div>';
         echo '<section class="'.$languageClass.'"> <pre class="line-numbers"><code>'.$code.'</code></pre> </section>';
-        echo '<a href="action.php?action=edit&id=' . $row['ID'] . '" class="editButton">Editer</a>';
-        echo '<a href="action.php?action=delete&id=' . $row['ID'] . '" onclick="return confirm(\'Souhaitez-vous vraiment supprimer ce snippet ?\');" class="deleteButton">Supprimer</a>';
+        echo '<a href="action.php?action=edit&id=' . $row['ID'] . '" class="editButton">'.$messages['edit'].'</a>';
+        echo '<a href="action.php?action=delete&id=' . $row['ID'] . '" onclick="return confirm(\'',$messages['reallydeletesnippet'],'\');" class="deleteButton">'.$messages['delete'].'</a>';
         echo '<hr><br></div>';
     }
 
@@ -254,36 +265,18 @@ if (($_GET["action"] == "allsnippets")) {
     // Pagination
     // First page
     if ($snippets_count > $limit & $page == 1) {
-        echo '<center><a href= "action.php?action=allsnippets&view='.$view.'&page=2"> Older snippets >>> </a></center>';
+        echo '<center><a href= "action.php?action=allsnippets&view='.$view.'&page=2"> ',$messages['oldersnippets'],' >>> </a></center>';
     }
     // Last page
     if ($page > 1 & $snippets_count <= ($limit * $page) & $snippets_count > ($limit * ($page - 1))) {
-        echo '<center><a href= "action.php?action=allsnippets&view='.$view.'&page=' . ($page - 1) . '"> <<< Newer snippets </a></center>';
+        echo '<center><a href= "action.php?action=allsnippets&view='.$view.'&page=' . ($page - 1) . '"> <<< ',$messages['newestsnippets'],' </a></center>';
     }
     // Middle page
     if ($page > 1 & $snippets_count > ($limit * $page)) {
-        echo '<center><a href= "action.php?action=allsnippets&view='.$view.'&page=' . ($page - 1) . '"> <<< Newer snippets</a> -- <a href="action.php?action=allsnippets&page=' . ($page + 1) . '">Older snippets >>></a></center>';
+        echo '<center><a href= "action.php?action=allsnippets&view='.$view.'&page=' . ($page - 1) . '"> <<< ',$messages['newestsnippets'],'</a> -- <a href="action.php?action=allsnippets&page=' . ($page + 1) . '">Older snippets >>></a></center>';
     }
 
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 // Edit a snippet based on its identifier
 if (($_GET["action"] == "edit")) {
@@ -305,65 +298,63 @@ if (($_GET["action"] == "edit")) {
         echo'
         <form id="form" method="post">
         <table>
-        <tr><td>Titre</td><td><input type="text" name="name" id="name" style="width:500px;" value="';
+        <tr><td>',$messages['title'],'</td><td><input type="text" name="name" id="name" style="width:500px;" value="';
         echo $row['name'];
         echo'"/></td></tr>
-        <tr><td width="200px">Langage</td><td>
+        <tr><td width="200px">',$messages['language'],'</td><td>
         <select id="language" name="language" >
         <option  ';
-        if ($row['language'] == 'html')
-            echo 'selected'; echo' value="html">html</option>
+        if ($row['language'] == 'HTML')
+            echo 'selected'; echo' value="HTML">HTML</option>
         <option ';
-        if ($row['language'] == 'css')
-            echo 'selected'; echo' value="css">css</option>
+        if ($row['language'] == 'CSS')
+            echo 'selected'; echo' value="CSS">CSS</option>
         <option ';
-        if ($row['language'] == 'javascript')
-            echo 'selected'; echo' value="javascript">javascript</option>
+        if ($row['language'] == 'JavaScript')
+            echo 'selected'; echo' value="JavaScript">JavaScript</option>
         <option ';
-        if ($row['language'] == 'python')
-            echo 'selected'; echo' value="python">python</option>
+        if ($row['language'] == 'Python')
+            echo 'selected'; echo' value="Python">Python</option>
         <option ';
-        if ($row['language'] == 'text')
-            echo 'selected'; echo' value="text">text</option>
+        if ($row['language'] == 'Text')
+            echo 'selected'; echo' value="Text">Text</option>
         <option ';
-
         if ($row['language'] == 'R')
-            echo 'selected'; echo' value="r">r</option>
+            echo 'selected'; echo' value="R">R</option>
         <option ';
-
-        if ($row['language'] == 'perl')
-            echo 'selected'; echo' value="perl">perl</option>
+        if ($row['language'] == 'Perl')
+            echo 'selected'; echo' value="Perl">Perl</option>
         <option ';
-
-        if ($row['language'] == 'rust')
-            echo 'selected'; echo' value="rust">rust</option>
+        if ($row['language'] == 'Rust')
+            echo 'selected'; echo' value="Rust">Rust</option>
         <option ';
-
-        if ($row['language'] == 'bash')
-            echo 'selected'; echo' value="bash">bash</option>
+        if ($row['language'] == 'Bash')
+            echo 'selected'; echo' value="Bash">Bash</option>
         <option ';
-
-        if ($row['language'] == 'c')
-            echo 'selected'; echo' value="c">c</option>
+        if ($row['language'] == 'C')
+            echo 'selected'; echo' value="C">C</option>
         <option ';
-        if ($row['language'] == 'c++')
-            echo 'selected'; echo' value="c++">c++</option>
+        if ($row['language'] == 'C++')
+            echo 'selected'; echo' value="C++">C++</option>
         <option ';
-        if ($row['language'] == 'ruby')
-            echo 'selected'; echo' value="ruby">ruby</option>
+        if ($row['language'] == 'Ruby')
+            echo 'selected'; echo' value="Ruby">Ruby</option>
         <option ';
-        if ($row['language'] == 'sql')
-            echo 'selected'; echo' value="sql">sql</option>
+        if ($row['language'] == 'SQL')
+            echo 'selected'; echo' value="SQL">SQL</option>
         <option ';
-        if ($row['language'] == 'java')
-            echo 'selected'; echo' value="java">java</option>
+        if ($row['language'] == 'Java')
+            echo 'selected'; echo' value="Java">Java</option>
+        <option';
+        if ($row['language'] == 'MATLAB')
+            echo 'selected'; echo' value="MATLAB">MATLAB</option>
         <option ';
-        if ($row['language'] == 'php')
-            echo 'selected'; echo' value="php">php</option>
+        if ($row['language'] == 'PHP')
+            echo 'selected'; echo' value="PHP">PHP</option>
 
                 </select>
                 </td></tr>
-                <tr><td>Description</td><td><textarea name="description" id="description" style="width:500px;height:100px;">';
+                <tr><td>',$messages['description'],'</td><td><textarea name="description" id="description" style="width:500px;height:100px;">';
         echo $row['description'];
         echo '</textarea></td></tr>
 
@@ -371,27 +362,15 @@ if (($_GET["action"] == "edit")) {
         echo $row['code'];
         echo '</textarea></td></tr>';
 
-        echo '<tr><td>Tags (séparés par des virgules)</td><td><input type="text" name="tags" id="tags" style="width:500px;" value="';
+        echo '<tr><td>',$messages['tagscommasep'],'</td><td><input type="text" name="tags" id="tags" style="width:500px;" value="';
         echo $row['tags'];
         echo '"/></td></tr>';
 
         echo '<input hidden="true" type="text" name="old_tags" style="width:500px;" value="';
         echo $row['tags'];
         echo '"/></td></tr>';
-
-
-        if ($status == "admin"){
-            echo '<tr><td>Private</td><td><input type="checkbox" name="private"';
-            if ($row['private'] == "on") {
-                echo "checked></td></tr>";
-            }
-        }
-        else {
-
-        }
-
         echo"</table>
-            <input class='loginButton' type='submit' value='Mettre à jour'/>
+            <input class='loginButton' type='submit' value='",$messages['update'],"' />
         </form>
     </div>
 
@@ -429,32 +408,31 @@ if (($_GET["action"] == "edit")) {
             }
         });
 
-
-
         $(function() {
             $('#form').on('submit', function() {
+                allowed_languages  = ['C','C++','CSS','HTML','Java','JavaScript','PHP','Python','Ruby','SQL','R','Bash','Perl','Rust','Text','MATLAB'];
                 if( !$('#name').val() ) {
-                    alert('Veuillez saisir un titre pour votre snippet');
+                    alert('",$messages['providetitle'],"');
                     return false;
                 }
                 if( !$('#description').val() ) {
-                    alert('Une petite description ne fait pas de mal...');
+                    alert('",$messages['providedescription'],"');
                     return false;
                 }
                 if( !$('#code').val() ) {
-                    alert('Un snippet sans code n\'est point un snippet!');
+                    alert('",$messages['providecode'],"');
                     return false;
                 }
                 if( !$('#tags').val() ) {
-                    alert('Quelques tags ne feraient pas de mal!');
+                    alert('",$messages['providetag'],"');
                     return false;
                 }
-
+                if ( allowed_languages.indexOf( $('#language').val() ) < 0 ){
+                    alert('",$messages['choosecorrectlng'],"');
+                    return false;
+                }
             });
         });
-
-
-
     </script>";
     }
 
@@ -469,6 +447,8 @@ if (($_GET["action"] == "edit")) {
         $code = str_replace($search, $replace, $code);
         $old_tags = $_POST['old_tags'];
 
+        // $old_tags = str_replace($search, $replace, $old_tags);
+
         // update the list of tags
         $oldTagsList=explode(",",$old_tags);
         foreach($oldTagsList as $var){
@@ -481,6 +461,7 @@ if (($_GET["action"] == "edit")) {
         }
 
         $tags = $_POST['tags'];
+        $tags = str_replace($search, $replace, $tags);
         $tagsList=explode(",",$tags);
         foreach($tagsList as $var){
             // $lowtag = strtolower($var);
@@ -501,10 +482,10 @@ if (($_GET["action"] == "edit")) {
         }
 
 
-        $private = (isset($_POST['private']) && $_POST['private'] === "on")?"on":"off";
+        // $private = (isset($_POST['private']) && $_POST['private'] === "on")?"on":"off";
         $lines = (isset($_POST['lines']) && $_POST['lines'] === "on")?"on":"off";
         $id = $_GET['id'];
-        $query_update = "UPDATE $mytable set name='$name', code='$code', language='$language', description='$description', private='$private', lines='$lines', highlight='$highlight', tags='$tags'  where ID='$id' ";
+        $query_update = "UPDATE $mytable set name='$name', code='$code', language='$language', description='$description', lines='$lines', highlight='$highlight', tags='$tags'  where ID='$id' ";
         $results = $base->exec($query_update);
 
         header("location:index.php?view=all");
@@ -554,8 +535,7 @@ if (isset($_POST["add"])) {
     $name = str_replace($search, $replace, $name);
     $description = str_replace($search, $replace, $_POST['description']);
     $code = str_replace($search, $replace, $code);
-
-
+    $tags = str_replace($search, $replace, $tags);
 
     $query = "INSERT INTO $mytable(username, language, name, description, code, private, lines, highlight, date, tags, score, rate_counter)
                     VALUES ('$username', '$language', '$name', '$description', '$code', '$private', '$lines','$highlight' , '$date', '$tags', 0,0 )";
@@ -598,42 +578,41 @@ if (($_GET["action"] == "add")) {
     include 'admin-menu.php';
     ?>
 
-    <h1>Add a new snippet</h1>
+    <h1>Ajouter un snippet</h1>
 
     <div id="newSnippet">
 
         <form id="form" name="newSnippet" method="post" action="action.php" accept-charset="UTF-8">
             <table>
 
-                <tr><td>Titre</td><td><input type="text" name="name" id="name" style="width:500px;"/></td></tr>
-                <tr><td width="200px">Langage</td><td>
+                <tr><td><?php echo $messages['title']; ?></td><td><input type="text" name="name" id="name" style="width:500px;"/></td></tr>
+                <tr><td width="200px"><?php echo $messages['language']; ?></td><td>
                         <select id="language" name="language" style="max-width:40%;">
-                            <option value="c">c</option>
-                            <option value="c++">c++</option>
-                            <option value="css">css</option>
-                            <option value="html">html</option>
-                            <option value="java">java</option>
-                            <option value="javascript">javascript</option>
-                            <option value="php">php</option>
-                            <option value="python">python</option>
-                            <option value="ruby">ruby</option>
-                            <option value="sql">sql</option>
-                            <option value="r">R</option>
-                            <option value="bash">bash</option>
-                            <option value="perl">perl</option>
-                            <option value="rust">rust</option>
-                            <option value="text">text</option>
+                            <option value="Bash">Bash</option>
+                            <option value="C">C</option>
+                            <option value="C++">C++</option>
+                            <option value="CSS">CSS</option>
+                            <option value="HTML">HTML</option>
+                            <option value="Java">Java</option>
+                            <option value="JavaScript">JavaScript</option>
+                            <option value="MATLAB">MATLAB</option>
+                            <option value="Perl">Perl</option>
+                            <option value="PHP">PHP</option>
+                            <option value="Python">Python</option>
+                            <option value="Ruby">Ruby</option>
+                            <option value="SQL">SQL</option>
+                            <option value="R">R</option>
+                            <option value="Rust">Rust</option>
+                            <option value="Text">Text</option>
                         </select>
-
-
                     </td></tr>
-                <tr><td>Description</td><td><textarea name="description" id="description" style="width:500px;height:100px;"></textarea></td></tr>
+                <tr><td><?php echo $messages['description']; ?></td><td><textarea name="description" id="description" style="width:500px;height:100px;"></textarea></td></tr>
                 <tr><td>Code</td><td><textarea name="code" id="code" style="width:500px;height:300px;"></textarea></td></tr>
-                <tr><td>Tags (séparés par des virgules)</td><td><input type="text" id="tags" name="tags" style="width:500px;"/></td></tr>
+                <tr><td><?php echo $messages['tagscommasep']; ?></td><td><input type="text" id="tags" name="tags" style="width:500px;"/></td></tr>
 
             </table>
             <input name="add" type="hidden" />
-            <input class="loginButton" type="submit" value="Ajouter snippet" class="submit"/>
+            <input class="loginButton" type="submit" value="<?php echo $messages['addsnippet']; ?>" class="submit"/>
 
         </form>
     </div>
@@ -674,51 +653,41 @@ if (($_GET["action"] == "add")) {
         });
 
         $(function() {
+
             $('#form').on('submit', function() {
+                allowed_languages  = ['C','C++','CSS','HTML','Java','JavaScript','PHP','Python','Ruby','SQL','R','Bash','Perl','Rust','Text','MATLAB'];
+
                 if( !$("#name").val() | $("#name").val().trim().length == 0 ) {
-                    alert('Veuillez saisir un titre pour votre snippet');
+                    alert("<?php echo($messages['providetitle']); ?>")
                     return false;
                 }
                 if( !$("#description").val() | $("#description").val().trim().length == 0) {
-                    alert('Une petite description ne fait pas de mal...');
+                    alert("<?php echo($messages['providedescription']); ?>")
                     return false;
                 }
                 if( !$("#code").val() | $("#code").val().trim().length == 0 ) {
-                    alert('Un snippet sans code n\'est point un snippet!');
+                    alert("<?php echo($messages['providecode']); ?>")
                     return false;
                 }
                 if( !$("#tags").val() | $("#tags").val().trim().length == 0 ) {
-                    alert('Quelques tags ne feraient pas de mal!');
+                    alert("<?php echo($messages['providetag']); ?>")
                     return false;
                 }
-
+                if ( allowed_languages.indexOf( $("#language").val() ) < 0 ){
+                    alert("<?php echo($messages['choosecorrectlng']); ?>")
+                    return false;
+                }
+                if (/[~`!@#$%\^&*+=\-\[\]\\';/{}|\\":.<>\?]/g.test($("#tags").val()) ){
+                    alert("<?php echo($messages['nospecialchartag']); ?>")
+                    return false;
+                }
             });
         });
 
     </script>
-
-
-
-    <!-- <script>
-    daySelect = document.getElementById('version');
-    document.getElementById("language").onchange = function(e) {
-        var index = this.selectedIndex;
-        var inputText = this.children[index].innerHTML.trim();
-        // alert(inputText);
-        if (inputText == "python"){
-            // add python version
-            daySelect.options[daySelect.options.length] = new Option('Text 1', 'Value1');
-            daySelect.options[daySelect.options.length] = new Option('Text 2', 'Value2');
-        }
-    }
-    </script> -->
-
     </html>
     <?php
 }
-
-
-
 
 
 // Page for users configuration
@@ -746,7 +715,7 @@ if (($_GET["action"] == "users")) {
         $results_name = $base->query($query_name);
 
 
-        echo '<h1>Utilisateurs enregistrés</h1><div id="newSnippet">';
+        echo '<h1>'.$messages['users'].'</h1><div id="newSnippet">';
 
         echo '<table>';
         // Loop and write all the recent snippets
@@ -757,27 +726,16 @@ if (($_GET["action"] == "users")) {
 
             echo '<tr>';
             echo '<td>'.$name.'</td><td>'.$status.'</td><td>';
-            echo '<a href="action.php?action=edituser&id=' . $name . '" class="editButton">Editer</a>';
-            echo '<a href="action.php?action=deleteuser&id=' . $name . '" onclick="return confirm(\'Souhaitez-vous vraiment supprimer cet utilisateur ?\');" class="deleteButton">Supprimer</a></td></tr>';
+            echo '<a href="action.php?action=edituser&id=' . $name . '" class="editButton">'.$messages['edit'].'</a>';
+            echo '<a href="action.php?action=deleteuser&id=' . $name . '" onclick="return confirm(\'',$messages['reallydeleteuser'],'\');" class="deleteButton">'.$messages['delete'].'</a></td></tr>';
 
         }
         echo "</table><br><br>";
-        echo '<a href="action.php?action=adduser" class="addButton" style="width:150px !important;">Ajout utilisateur</a>';
+        echo '<a href="action.php?action=adduser" class="addButton" style="width:150px !important;">'.$messages['adduser'].'</a>';
 
-        // Pagination
-        // First page
-        // if ($snippets_count > $limit & $page == 1) {
-        //     echo '<center><a href= "index.php?page=2"> Older snippets >>> </a></center>';
-        // }
-        // // Last page
-        // if ($page > 1 & $snippets_count <= ($limit * $page) & $snippets_count > ($limit * ($page - 1))) {
-        //     echo '<center><a href= "index.php?page=' . ($page - 1) . '"> <<< Newer snippets </a></center>';
-        // }
-        // // Middle page
-        // if ($page > 1 & $snippets_count > ($limit * $page)) {
-        //     echo '<center><a href= "index.php?page=' . ($page - 1) . '"> <<< Newer snippets</a> -- <a href="index.php?page=' . ($page + 1) . '">Older snippets >>></a></center>';
-        // }
-        // ?>
+        // Implement pagination for users list
+        // Implement lock to activate/deactivate user with one click
+        ?>
 
         </center><br><br></div></body></html>
 
@@ -790,13 +748,7 @@ if (($_GET["action"] == "users")) {
     else{
         header("location:index.php?view=all");
     }
-
-
 }
-
-
-
-
 
 // Page for editing user
 if (($_GET["action"] == "edituser")) {
@@ -818,15 +770,15 @@ if (($_GET["action"] == "edituser")) {
         $email = $rowU["email"];
         ?>
 
-        <h1>Edit user</h1>
+        <h1><?php echo($messages['edituser']); ?></h1>
 
         <div id="newSnippet">
 
             <form action="action.php" method="post">
                 <table>
-                <tr><td width="150px">Nom d'utilisateur </td><td> <input type="text" name="username" maxlength="30" value=<?php echo $username ?> /></td></tr>
+                <tr><td width="150px"><?php echo($messages['username']); ?> </td><td> <input type="text" name="username" maxlength="30" value=<?php echo $username ?> /></td></tr>
                 <tr><td width="150px">Email </td><td> <input type="text" name="email" maxlength="40" value=<?php echo $email ?> /></td></tr>
-                <tr><td> Role </td><td>
+                <tr><td> <?php echo($messages['status']); ?> </td><td>
                 <select id="status" name="status">
                     <?php
                     if($status == "admin"){
@@ -838,21 +790,20 @@ if (($_GET["action"] == "edituser")) {
                         echo '<option name="isadmin" value="noadmin" selected>no-admin</option>';
                     }
                     ?>
-
                 </select>
                 </td></tr>
                     <?php
                     if ($active == 1){
-                        echo '<tr><td>Actif :</td><td> <input type="checkbox" name="active" checked /></td></tr>';
+                        echo '<tr><td>'.$messages['actif'].' </td><td> <input type="checkbox" name="active" checked /></td></tr>';
                     }
                     else {
-                        echo '<tr><td>Actif :</td><td> <input type="checkbox" name="active" /></td></tr>';
+                        echo '<tr><td>'.$messages['actif'].' </td><td> <input type="checkbox" name="active" /></td></tr>';
                     }
                     ?>
                 </table>
                 </center>
                 <input name="edituser" type="hidden" />
-                <input type="submit" value="Mettre à jour" class="installButton"/>
+                <input type="submit" value="<?php echo($messages['update']); ?>" class="installButton"/>
             </form>
             </div>
             </div>
@@ -865,7 +816,6 @@ if (($_GET["action"] == "edituser")) {
     else{
         header("location:index.php?view=all");
     }
-
 }
 
 // Edit user details
@@ -882,38 +832,43 @@ if (isset($_POST["edituser"])) {
             $results = $base->exec($query_update);
             header("location:action.php?action=users");
 
+            // send email to inform the user that accounts was activated
+            // Send email to user
+            $from = "canSnippet"; // this is the sender's Email address
+            $subject = "Votre compte canSnippet est actif";
+            $message = ''.$messages['bonjour'].''.$id.''.$messages['useractivatedemail'].'';
+
+            $header_array = [
+                "MIME-Version: 1.0",
+                "Content-type: text/plain; charset=UTF-8",
+                "From: ".$from."",
+            ];
+            $headers = implode("\r\n", $header_array);
+
+            mail($email,$subject,$message,$headers);
         }
         else {
             $query_update = "UPDATE user set active=0, status=\"".$isadmin."\", email=\"".$email."\"  where username=\"".$id."\" ";
             $results = $base->exec($query_update);
             header("location:action.php?action=users");
-
         }
-
-
     }
     else{
         header("location:index.php?view=all");
     }
 }
 
-
-
-
-// Page for adding new snippet
+// Page for adding new user
 if (($_GET["action"] == "adduser")) {
     if($_SESSION['admin']=="admin"){
-
         include 'admin-menu.php';
         ?>
-
-        <h1>Add a new user</h1>
-
+        <h1><?php echo $messages['adduser']; ?></h1>
         <div id="newSnippet">
 
             <form action="action.php" method="post">
                 <table>
-                <tr><td width="150px">Nom d'utilisateur </td><td> <input type="text" name="username" maxlength="30" /></td></tr>
+                <tr><td width="150px"> <?php echo($messages['username']); ?></td><td> <input type="text" name="username" maxlength="30" /></td></tr>
                 <tr><td width="150px">Email </td><td> <input type="text" name="email" maxlength="40" /></td></tr>
                 <tr><td> Role </td><td>
                 <select id="status" name="status">
@@ -921,11 +876,11 @@ if (($_GET["action"] == "adduser")) {
                     <option value="noadmin">no-admin</option>
                 </select>
                 </td></tr>
-                <tr><td>Mot de passe </td><td> <input type="password" name="pass1" /></td></tr>
+                <tr><td><?php echo($messages['password']); ?> </td><td> <input type="password" name="pass1" /></td></tr>
                 </table>
                 </center>
                 <input name="adduser" type="hidden" />
-                <input type="submit" value="Ajouter" class="installButton"/>
+                <input type="submit" value="<?php echo($messages['add']); ?>" class="installButton"/>
             </form>
 
 
@@ -939,14 +894,7 @@ if (($_GET["action"] == "adduser")) {
     else{
         header("location:index.php?view=all");
     }
-
-
 }
-
-
-
-
-
 
 // Save new user to the database
 if (isset($_POST["adduser"])) {
@@ -968,38 +916,20 @@ if (isset($_POST["adduser"])) {
             $string = md5(uniqid(rand(), true));
             return substr($string, 0, 3);
         }
-
+        // generate salt and hash for pwd
         $salt = createSalt();
         $hash = hash('sha256', $salt . $hash);
-
-
         // Add the user to the database
         $addUser = "INSERT INTO user(username, status, password, salt, active, email)
             VALUES ('$username', '$status' , '$hash' ,'$salt', 1, '$email')";
         $base->exec($addUser);
-
         // returns to the main admin page
         header("location:action.php?action=users");
     }
     else{
         header("location:index.php?view=all");
     }
-
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 // Preferences page with general options
 if (($_GET["action"] == "preferences")) {
@@ -1014,17 +944,14 @@ if (($_GET["action"] == "preferences")) {
     $resultsU = $base->query($queryU);
     $rowU = $resultsU->fetchArray();
     $status = $rowU["status"];
-
-
-
-    echo "<h1>Préferences</h1>";
+    echo "<h1>".$messages['preferences']."</h1>";
     echo "<div id='newSnippet'>";
 
     // show css settings only to admins
     if ($status == "admin"){
     ?>
 
-    <h2>Changer le thème</h2>
+    <h2><?php echo($messages['changetheme']); ?></h2>
     <br>
         <form id="form" name="prism_theme" method="post" >
             <select name="prism_theme">
@@ -1037,10 +964,23 @@ if (($_GET["action"] == "preferences")) {
                 ?>
             </select>
             <br>
-            <input class="loginButton" type="submit" value="Charger CSS" class="submit" />
+            <input class="loginButton" type="submit" value="<?php echo($messages['chargecss']); ?>" class="submit" />
         </form>
         <br>
     <hr>
+    <h2><?php echo($messages['changelng']); ?></h2>
+
+    <form id="form-pwd" name="settings2" method="post" >
+        <br />
+        <select name="language">
+            <option value="fr"><?php echo($messages['french']); ?></option>
+            <option value="en"><?php echo($messages['english']); ?></option>
+        </select>
+        <br />
+        <input class="loginButton" type="submit" value="<?php echo($messages['changelngbutton']); ?>" class="submit" />
+    </form>
+    <br>
+    <hr />
 
 
 
@@ -1052,18 +992,20 @@ if (($_GET["action"] == "preferences")) {
     $row_pwd = $results_pwd->fetchArray()
     ?>
         <br>
-        <h2>Changer le mot de passe</h2>
+        <h2><?php echo($messages['changepwd']); ?></h2>
 
         <form id="form-pwd" name="settings2" method="post" >
             <br>
             <table>
                 <tr><td width="200px">
-                        Nouveau mdp</td><td> <input class="login" type="password" name="password1" ></td></tr>
-                <tr><td>Répéter mdp</td><td> <input class="login" type="password" name="password2" ></td></tr>
+                        <?php echo($messages['newpwd']); ?></td><td> <input class="login" type="password" name="password1" ></td></tr>
+                        <tr><td><?php echo($messages['repeatpassword']); ?></td><td> <input class="login" type="password" name="password2" ></td></tr>
             </table>
             <input name="username" type="hidden" value=" <?php echo $row_pwd['username']; ?> "/>
-            <input class="loginButton" type="submit" value="Changer mdp" class="submit"/>
+            <input class="loginButton" type="submit" value="<?php echo($messages['changepwdbutton']); ?>" class="submit"/>
         </form>
+
+        <br />
     </div>
     </body></html>
 
@@ -1071,12 +1013,13 @@ if (($_GET["action"] == "preferences")) {
     // Update the new settings
     if ($_SERVER['REQUEST_METHOD'] == 'POST') {
 
-        // if (isset($_POST['theme'])) {
-        //     $theme = $_POST['theme'];
-        //     $queryUpdateSettings = "UPDATE settings set theme= '$theme' ";
-        //     $base->exec($queryUpdateSettings);
-        //     echo "<script>location.href='action.php?action=preferences';</script>";
-        // }
+        if (isset($_POST["language"])) {
+            // $base = new SQLite3("../".$config['dbname']);
+            $query = "UPDATE settings set lng='".$_POST['language']."' ";
+            $base->exec($query);
+            // returns to the main admin page
+            header("location:index.php?view=all");
+        }
 
         if (isset($_POST["prism_theme"])) {
             // $base = new SQLite3("../".$config['dbname']);
@@ -1085,26 +1028,36 @@ if (($_GET["action"] == "preferences")) {
             // returns to the main admin page
             header("location:index.php?view=all");
         }
+        $pass1 = $_POST['password1'];
+        if (preg_match('/[A-Z]/', $pass1) && preg_match('/[0-9]/', $pass1)){
+            if ($_POST['password1'] == $_POST['password2']) {
+                $password1 = $_POST['password1'];
+                $hash = hash('sha256', $password1);
 
-        if (isset($_POST['password1']) && isset($_POST['password2']) && $_POST['password1'] == $_POST['password2']) {
-            $password1 = $_POST['password1'];
-            $hash = hash('sha256', $password1);
+                //creates a 3 character sequence
+                function createSalt() {
+                    $string = md5(uniqid(rand(), true));
+                    return substr($string, 0, 3);
+                }
 
-            //creates a 3 character sequence
-            function createSalt() {
-                $string = md5(uniqid(rand(), true));
-                return substr($string, 0, 3);
+                $salt = createSalt();
+                $hash = hash('sha256', $salt . $hash);
+                $queryUpdatePwd = "UPDATE user SET password='$hash', salt='$salt' WHERE username='$username' ";
+                $base->exec($queryUpdatePwd);
+                echo "<script>alert('Nouveau mot de passe sauvegardé!'); location.href='action.php?action=preferences';</script>";
             }
-
-            $salt = createSalt();
-            $hash = hash('sha256', $salt . $hash);
-            $queryUpdatePwd = "UPDATE user SET password='$hash', salt='$salt' WHERE username='$username' ";
-            $base->exec($queryUpdatePwd);
-            echo "<script>alert('Password successfuly changed!'); location.href='action.php?action=preferences';</script>";
-        } else {
+            else {
+                ?>
+                <script>
+                    alert("<?php echo $messages['repeatsamepwd'];  ?>");
+                </script>
+                <?php
+            }
+        }
+         else {
             ?>
             <script>
-                alert("Hmm, something is wrong ! Could you try again ?");
+                alert("<?php echo $messages['onecapitalonenumber'];  ?>");
             </script>
             <?php
         }

@@ -4,6 +4,8 @@ Order Allow,Deny
 Deny from all
 </Files>
 
+ErrorDocument 404 /404.html
+
 # Protect log.txt
 <Files ~ "\.(sqlite)$">
 Order Allow,Deny
@@ -11,4 +13,4 @@ Deny from all
 </Files>
 
 # Disabling magic quotes
-SetEnv MAGIC_QUOTES 0 
+SetEnv MAGIC_QUOTES 0

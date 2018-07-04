@@ -1,13 +1,23 @@
 <?php
 /*
   @author: Ademcan (ademcan@ademcan.net)
-  @name: details.php
-  @description: show a single snippet in one page with the related information, helpful for snippet sharing
+  @name: tags.php
+  @description: shows the results for snippet search by tag
  */
 
     session_start();
+    require_once("./config.php");
+    $lng = language();
 
-    include "config.php";
+    switch ($lng) {
+        case "en":
+            require("./en.php");
+            break;
+        case "fr":
+            require("./fr.php");
+            break;
+    }
+
     include 'includes/menu.php';
 
     $tag=$_GET["tag"];
@@ -29,7 +39,7 @@
         $score_array[] = $row['snippet'];
     }
 
-    echo '<h1>Recherche de tag: '.$tag.'</h1>';
+    echo '<h1>'.$messages['tagresults'].': '.$tag.'</h1>';
 
     while($row = $results_name->fetchArray())
     {
@@ -78,10 +88,10 @@
 
                 $lowtag=trim($var);
                 if ($lowtag == ""){
-                    echo 'Aucun tag&nbsp;';
+                    echo $messages['notag'].'&nbsp;';
                 }
                 else{
-                    echo '<a href="tags.php?tag='.$lowtag.'" style="color:black;text-decoration:underline">'.$lowtag.'</a>&nbsp;';
+                    echo '<a href="tags.php?tag='.rawurlencode($lowtag).'" style="color:black;text-decoration:underline">'.$lowtag.'</a>&nbsp;';
                 }
             }
             echo "</div><br>";
@@ -112,77 +122,19 @@
                     </span>';
                 }
             }
-
             echo '<div id="scores'.$id.'"><b> '.$score.'</b>/5 - ['.$rate_counter.' ';
 
             if ($rate_counter < 2){
-                echo ' rating] </div>';
+                echo ' ',$messages['rating'],'] </div>';
             }
             else {
-                echo ' ratings] </div>';
+                echo ' ',$messages['ratings'],'] </div>';
             }
             echo '<br><hr ><br>';
         }
     }
-
-
-
-
-    // while($row = $results_name->fetchArray())
-    // {
-    //     $tags= $row['tags'];
-    //     $tags = str_replace(' ', '', $tags);
-    //     $tagsList=explode(",",$tags);
-    //
-    //     if (in_array($tag, $tagsList)) {
-    //
-    //         $name = $row['name'];
-    //         echo '<h1 style="padding-top:50px;"> '.$name;
-    //
-    //         $private = $row['private'];
-    //         $lines = $row['lines'];
-    //         if ($private=="on"){
-    //             echo '<img src="images/lockFlat.png" style="width:20px; height: 20px;padding-left:10px;" />';
-    //         }
-    //         echo '</h1>';
-    //
-    //         $code = $row['code'];
-    //         $language = $row['language'];
-    //         $date = $row['date'];
-    //         $description = $row['description'];
-    //         $highlight = $row['highlight'];
-    //
-    //         if ($language=="html"){
-    //             $languageClass = "language-markup";
-    //         }
-    //         else if ($language=="text"){
-    //             $languageClass = "language-markup";
-    //         }
-    //         else{
-    //             $languageClass = "language-".$language;
-    //         }
-    //
-    //         echo '<font size="1"><i>'.$language.'</i> - '.$date.'</font><br>';
-    //         echo '<img src="images/info.png" style="vertical-align: middle;"/>';
-    //         echo '&nbsp;&nbsp;'.nl2br($description);
-    //         if ($lines=="on"){
-    //             echo '<section class="'.$languageClass.'"> <pre class="line-numbers"><code>'.$code.'</code></pre> </section>';
-    //         }
-    //         else if ($highlight!=""){
-    //             echo '<section class="'.$languageClass.'"> <pre data-line='.$highlight.'><code>'.$code.'</code></pre> </section>';
-    //         }
-    //         else {
-    //             echo '<section class="'.$languageClass.'"> <pre><code>'.$code.'</code></pre> </section>' ;
-    //         }
-    //         echo '<hr style="width:95%; height:5px;background-color:#2ecc71;border-radius:20px;border-color:#2ecc71;border-style:none;">';
-    //
-    //     }
-    // }
-
     echo '</div></body></html>';
 ?>
-
-
 
 
 <script type="text/javascript">
@@ -205,8 +157,5 @@
         xhr2.open("POST", "action.php", true);
         xhr2.setRequestHeader("Content-Type", "application/x-www-form-urlencoded");
         xhr2.send("rating="+rating+"&action=updatescore&id="+id+"&username="+loggedin_username+"");
-
-        // only one radio can be logically checked, don't check the rest
-
     }
 </script>
