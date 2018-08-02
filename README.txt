@@ -1,32 +1,27 @@
+# canSnippet Community Edition (CE)
 
-canSnippet Community Edition (CE)
+**Website**: [canSnippet.org](http://cansnippet.org/)
+**Author**: ademcan (ademcan@ademcan.net)
+**Version**: 2.0
+**License**: CC BY
 
-Website: http://www.cansnippet.org/
-Author: ademcan (ademcan@ademcan.net)
-Version: 1.0 beta
-License: CC BY
-
+## Description
 canSnippet is an open source web-based application to save and share your snippets.
+For more details check [canSnippet.org](http://cansnippet.org/).
 
+## Installation
+1 - Download the latest canSnippet.zip file
+2 - send the zip file to your server and unzip
+3 - open the following URL in your web browser
+`http://[YOUR_DOMAIN]/canSnippet/`
+4 - Follow the unique instruction (i.e. fill in the form)
+5 - Remove the install.php file for better security
+6 - You are done ! Now you canSnippet...
 
-Installation :
-- Download the latest canSnippet.zip file
-- send the zip file to your server and unzip
-- open the following URL in your web browser
-http://[YOUR_DOMAIN]/canSnippet/
-- Follow the unique instruction (i.e. fill in the form)
-- Remove the install.php file for better security
-- You are done ! Now you canSnippet...
-- If you use nginx add the following line to protect your sqlite file
-	location ~ \.sqlite {
-		deny all;
-	}
+## Screenshots
+![Home page](https://ademcan.net/gallery/photos/canSnippet/canSnippetCE2_main.png)
+![Admin interface](https://ademcan.net/gallery/photos/canSnippet/canSnippetCE2_admin.png)
 
-Add theme for prism :
-Simply put your css file in css/prism_them and go in admin interface to select your theme
-
-Screenshots:
-http://ademcan.net/gallery/?dir=canSnippet
-
-Demo :
-http://ademcan.net/canSnippet/
+## Thanks
+- Big thank you to the bioinfo-fr community and beta testers to make v2.0 real
+- Thanks to [Isabelle Stévant](https://imago-fr.net) for the icons and the font.
