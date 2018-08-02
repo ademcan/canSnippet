@@ -6,7 +6,18 @@
  */
 
 session_start();
-require('../fr.php');
+require_once("../config.php");
+$lng = language();
+
+switch ($lng) {
+    case "en":
+        require("../en.php");
+        break;
+    case "fr":
+        require("../fr.php");
+        break;
+}
+
 ?>
 <html>
     <head>
@@ -32,22 +43,21 @@ require('../fr.php');
         </div>
 
         <div id="registerWindow">
-            <br><h2>&nbsp;Nouveau compte</h2><br>
-                <form method="POST" >
-                    <input type="hidden" value="register" name="register" />
-                    <table>
-                        <tr><td width="200px">Nom d'utilisateur :</td><td> <input class="login" type="text" name="username2" ></td></tr>
-                        <tr><td>Email :</td><td> <input class="login" type="email" name="email2" ></td></tr>
-                        <tr><td>Mot de passe :</td><td> <input class="login" type="password" name="password1" ></td></tr>
-                        <tr><td>Répéter le mot de passe :</td><td> <input class="login" type="password" name="password2" ></td></tr>
-                    </table>
-                  <input type="submit" value="Enregistrer" class="loginButton" />
-                </form>
-
+            <br><h2>&nbsp;<?php echo($messages['newaccount']); ?> </h2><br>
+            <form method="POST" >
+                <input type="hidden" value="register" name="register" />
+                <table>
+                    <tr><td width="200px"><?php echo($messages['username']); ?> :</td><td> <input class="login" type="text" name="username2" ></td></tr>
+                    <tr><td>Email :</td><td> <input class="login" type="email" name="email2" ></td></tr>
+                    <tr><td><?php echo($messages['password']); ?> :</td><td> <input class="login" type="password" name="password1" ></td></tr>
+                    <tr><td><?php echo($messages['repeatpassword']); ?> :</td><td> <input class="login" type="password" name="password2" ></td></tr>
+                </table>
+              <input type="submit" value="<?php echo($messages['save']); ?>" class="loginButton" />
+            </form>
         </div>
         <center>
             <br /><br />
-        <button type="button" class="homeButton" onclick='document.location.href="/";'>Accueil</button>
+        <button type="button" class="homeButton" onclick='document.location.href="/";'><?php echo($messages['home']); ?></button>
         </center>
 
     </body>
@@ -66,126 +76,121 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
 
     $base=new SQLite3($dbname);
 
+
+    $settingsQuery = "SELECT * FROM settings";
+    $settingsInfo = $base->query($settingsQuery);
+    $settings = $settingsInfo->fetchArray();
+    $adminEmail = $settings["email"];
+
     // ask for registration
     if($_POST['register']){
 
-        $username = $_POST['username2'];
         $email = $_POST['email2'];
         $pass1=$_POST['password1'];
         $pass2=$_POST['password2'];
 
-        // must provide a username
-        if (strlen($username) < 1){
+
+        // DO NOT ALLOW THE SAME EMAIL TWICE
+        $count_query = "SELECT count(*) AS count FROM user WHERE email=\"".$email."\" ";
+        $results_count = $base->query($count_query);
+        $row_count = $results_count->fetchArray();
+        $snippets_count = $row_count['count'];
+        $username = $_POST['username2'];
+        if($snippets_count>0){
             ?>
-            <script>alert("Veuillez saisir un nom d\'utilisateur")</script>
+            <script>
+                alert("<?php echo($messages['emailexists']); ?>")
+            </script>
             <?php
             header('Location: index.php?view=all');
         }
-        // if username is present
+
         else{
-            // DO NOT ALLOW THE SAME EMAIL TWICE
-            $count_query = "SELECT count(*) AS count FROM user WHERE email=\"".$email."\" ";
-            $results_count = $base->query($count_query);
-            $row_count = $results_count->fetchArray();
-            $snippets_count = $row_count['count'];
-
-            // check that email does not already exist
-            if($snippets_count>0){
+            if ( strlen($pass1) < 8){
                 ?>
-                <script>alert("Cette adresse email est déjà enregistré.")</script>
+                <script>
+                    alert("<?php echo($messages['pwdtooshort']); ?>")
+                </script>
                 <?php
-                header('Location: index.php?view=all');
             }
-            else{
-                if ( strlen($pass1) < 8){
-                    ?>
-                    <script>
-                        alert("Mot de passe trop court!");
-                    </script>
-                    <?php
-                }
-                //length is OK
-                else {
-                    // contains at least one capital letter and one number
-                    if (preg_match('/[A-Z]/', $pass1) && preg_match('/[0-9]/', $pass1)){
-                        if (strcmp($pass1, $pass2) !== 0){
-                            ?>
-                            <script>
-                                alert("Veuillez saisir deux fois le même mot de passe!");
-                            </script>
-                            <?php
-                        }
-                        else {
-
-                            if (preg_match('/[\s\'^£$%&*()}{@#~?><>,|=+¬-]/', $username)){
-                                ?>
-                                <script>
-                                    alert("Charactère invalide pour le nom d'utilisateur");
-                                </script>
-                                <?php
-                            }
-                            else{
-                                // Send email to admins
-                                // $to = "ademcan@ademcan.net"; // this is your Email address
-                                $to = "admin@bioinfo-fr.net"; // this is your Email address
-
-                                $from = $_POST['email2']; // this is the sender's Email address
-                                $username = SQLite3::escapeString($username);
-                                // $usernameDB = mysql_real_escape_string($username);
-                                $subject = "Nouveau compte pour canSnippet";
-                                $message = "Chèr(e)s admins,\n\nL'utilisateur suivant souhaiterait créer un nouveau compte sur canSnippet\n\nNom d'utilisateur: ".$username."\nAdresse email: ".$from.".\n\nSi vous ne souhaitez pas activer ce compte vous pouvez ignorer cet email.\nPour valider/activer ce compte veuillez vous identifier et vous rendre dans la section 'Utilisateurs' de votre instance canSnippet\n\nvia canSnippet";
-
-                                $header_array = [
-                                    "MIME-Version: 1.0",
-                                    "Content-type: text/plain; charset=UTF-8",
-                                    "From: ".$from."",
-                                ];
-                                $headers = implode("\r\n", $header_array);
-                                mail($to,$subject,$message,$headers);
-
-                                $hash = hash('sha256', $pass1);
-                                //creates a 3 character sequence for salt
-                                function createSalt() {
-                                    $string = md5(uniqid(rand(), true));
-                                    return substr($string, 0, 3);
-                                }
-                                $salt = createSalt();
-                                $hash = hash('sha256', $salt . $hash);
-                                $status = "noadmin";
-                                $addUser = "INSERT INTO user(username, status, password, salt, active, email) VALUES ('$username', '$status' , '$hash' ,'$salt', 0, '$from')";
-                                $base->exec($addUser);
-
-                                // Send email to user
-                                $to = $_POST['email2']; // this is your Email address
-                                $from = "admin@bioinfo-fr.net"; // this is the sender's Email address
-                                $username = $_POST['username2'];
-                                $username = SQLite3::escapeString($username);
-                                $subject = "Nouveau compte pour canSnippet";
-                                $message = "Bonjour ".$username.", \n\nNous vous remercions pour la création d'un compte sur canSnippet. Votre compte sera validé sous peu.\n\nLes admins de bioinfo-fr.net";
-
-                                $header_array = [
-                                    "MIME-Version: 1.0",
-                                    "Content-type: text/plain; charset=UTF-8",
-                                    "From: ".$from."",
-                                ];
-                                $headers = implode("\r\n", $header_array);
-                                mail($to,$subject,$message,$headers);
-
-                                ?>
-                                    <script>
-                                        location.href = '../thankyou.php';
-                                    </script>
-                                <?php
-                            }
-                        }
-                    }
-                    else {
+            //length is OK
+            else {
+                // contains at least one capital letter and one number
+                if (preg_match('/[A-Z]/', $pass1) && preg_match('/[0-9]/', $pass1)){
+                    if (strcmp($pass1, $pass2) !== 0){
                         ?>
                         <script>
-                            alert("Le mot de passe doit contenir au moins une lettre majuscule et un chiffre!");
+                            alert("<?php echo($messages['repeatsamepwd']); ?>")
                         </script>
                         <?php
                     }
+                    else {
+
+                        if (preg_match('/[\s\'^£$%&*()}{@#~?><>,|=+¬-]/', $username)){
+                            ?>
+                            <script>
+                                alert("<?php echo($messages['invalidchar']); ?>")
+                            </script>
+                            <?php
+                        }
+                        else{
+                            $to = "".$adminEmail.""; // this is your Email address
+
+                            $from = $_POST['email2']; // this is the sender's Email address
+                            $username = SQLite3::escapeString($username);
+                            // $usernameDB = mysql_real_escape_string($username);
+                            $subject = "".$messages['emailnewaccountsubject']."";
+                            $message = "".$messages['emailnewaccountbody1']."".$username."".$messages['emailnewaccountbody2']."".$from."".$messages['emailnewaccountbody3']."";
+
+                            $header_array = [
+                                "MIME-Version: 1.0",
+                                "Content-type: text/plain; charset=UTF-8",
+                                "From: ".$from."",
+                            ];
+                            $headers = implode("\r\n", $header_array);
+                            mail($to,$subject,$message,$headers);
+
+                            $hash = hash('sha256', $pass1);
+                            //creates a 3 character sequence for salt
+                            function createSalt() {
+                                $string = md5(uniqid(rand(), true));
+                                return substr($string, 0, 3);
+                            }
+                            $salt = createSalt();
+                            $hash = hash('sha256', $salt . $hash);
+                            $status = "noadmin";
+                            $addUser = "INSERT INTO user(username, status, password, salt, active, email) VALUES ('$username', '$status' , '$hash' ,'$salt', 0, '$from')";
+                            $base->exec($addUser);
+
+                            // Send email to user
+                            $to = $_POST['email2']; // this is your Email address
+                            $from = "canSnippet"; // this is the sender's Email address
+                            $username = $_POST['username2'];
+                            $username = SQLite3::escapeString($username);
+                            $subject = "".$messages['emailnewaccountsubject']."";
+                            $message = "".$messages['bonjour']." ".$username."".$messages['emailuseraccountcreation']."";
+
+                            $header_array = [
+                                "MIME-Version: 1.0",
+                                "Content-type: text/plain; charset=UTF-8",
+                                "From: ".$from."",
+                            ];
+                            $headers = implode("\r\n", $header_array);
+                            mail($to,$subject,$message,$headers);
+                            ?>
+                                <script>
+                                    location.href = '../thankyou.php';
+                                </script>
+                            <?php
+                        }
+                    }
+                }
+                else {
+                    ?>
+                    <script>
+                        alert("Le mot de passe doit contenir au moins une lettre majuscule et un chiffre!");
+                    </script>
+                    <?php
                 }
             }
         }
@@ -233,14 +238,12 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
                 <?php
             }
             else{
-
                 $_SESSION['admin'] = $userData['status'];
                 $_SESSION['valid'] = True;
                 $_SESSION['username'] = $username;
                 echo $_SESSION;
                 ?>
                     <script>
-
                         location.href = '../admin/index.php?view=all';
                     </script>
                 <?php
