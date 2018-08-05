@@ -10,13 +10,13 @@ canSnippet is an open source web-based application to save and share your snippe
 For more details check [canSnippet.org](http://cansnippet.org/).
 
 ## Installation
-1 - Download the latest canSnippet.zip file
-2 - send the zip file to your server and unzip
-3 - open the following URL in your web browser
+1. Download the latest canSnippet.zip file
+2. send the zip file to your server and unzip
+3. open the following URL in your web browser
 `http://[YOUR_DOMAIN]/canSnippet/`
-4 - Follow the unique instruction (i.e. fill in the form)
-5 - Remove the install.php file for better security
-6 - You are done ! Now you canSnippet...
+4. Follow the unique instruction (i.e. fill in the form)
+5. Remove the install.php file for better security
+6. You are done ! Now you canSnippet...
 
 ## Screenshots
 ![Home page](https://ademcan.net/gallery/photos/canSnippet/canSnippetCE2_main.png)
