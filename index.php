@@ -178,7 +178,7 @@
     // Pagination
     // First page
     if($snippets_count > $limit & $page == 1){
-        echo '<center><a href= "index.php?page=2"> Ancients snippets >>> </a></center>';
+        echo '<center><a href= "index.php?page=2"> ',$messages['oldersnippets'],' >>> </a></center>';
     }
     // Last page
     if($page > 1 & $snippets_count <= ($limit*$page) & $snippets_count > ($limit*($page-1)) ){
@@ -186,7 +186,7 @@
     }
     // Middle page
     if($page > 1 & $snippets_count > ($limit*$page)){
-        echo '<center><a href= "index.php?page='.($page-1).'"> <<< ',$messages['newestsnippets'],'</a> -- <a href="index.php?page='.($page+1).'">Ancients snippets >>></a></center>';
+        echo '<center><a href= "index.php?page='.($page-1).'"> <<< ',$messages['newestsnippets'],'</a> -- <a href="index.php?page='.($page+1).'">',$messages['oldersnippets'],' >>></a></center>';
     }
     echo '<center><font size="3">Powered by <a href="https://www.cansnippet.org/">canSnippet</a> CE - by <a href="https://ademcan.net/">ademcan</a><font></center>';
     echo '<br></div> </body></html>';
