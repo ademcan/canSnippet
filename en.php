@@ -93,4 +93,7 @@ $messages['emailnewaccountbody3'] = ".\n\nIf you don't want to activate this use
 $messages['emailuseraccountcreation'] = ", \n\nThank you for requesting an account on canSnippet. Your account will be validated shortly.";
 $messages['nonexistingsnippet'] = 'Sorry, this snippet does not exist or is not active anymore';
 $messages['successfullnewpwdmail'] = 'We just sent you an email to renew your password';
+$messages['wrongusernameorpwd'] = 'Wrong username or password!';
+$messages['accountinactivated'] = 'Your account has been inactivated, please contact the admins!';
+$messages['provideusername'] = 'Please provide a username';
 ?>

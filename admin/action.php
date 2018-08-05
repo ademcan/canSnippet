@@ -273,7 +273,7 @@ if (($_GET["action"] == "allsnippets")) {
     }
     // Middle page
     if ($page > 1 & $snippets_count > ($limit * $page)) {
-        echo '<center><a href= "action.php?action=allsnippets&view='.$view.'&page=' . ($page - 1) . '"> <<< ',$messages['newestsnippets'],'</a> -- <a href="action.php?action=allsnippets&page=' . ($page + 1) . '">Older snippets >>></a></center>';
+        echo '<center><a href= "action.php?action=allsnippets&view='.$view.'&page=' . ($page - 1) . '"> <<< ',$messages['newestsnippets'],'</a> -- <a href="action.php?action=allsnippets&page=' . ($page + 1) . '">',$messages['oldersnippets'],'  >>></a></center>';
     }
 
 }

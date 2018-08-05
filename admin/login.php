@@ -94,7 +94,9 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
         // must provide a username
         if (strlen($username) < 1){
             ?>
-            <script>alert("Veuillez saisir un nom d\'utilisateur")</script>
+            <script>
+                alert("<?php echo($messages['provideusername']); ?>")
+            </script>
             <?php
             header('Location: index.php?view=all');
         }
@@ -199,7 +201,7 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
                     else {
                         ?>
                         <script>
-                            alert("Le mot de passe doit contenir au moins une lettre majuscule et un chiffre!");
+                            alert("<?php echo $messages['onecapitalonenumber'];  ?>");
                         </script>
                         <?php
                     }
@@ -231,7 +233,7 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
         {
             ?>
                 <script>
-                    alert("Nom d'utilisateur ou mot de passe incorrect !");
+                    alert("<?php echo $messages['wrongusernameorpwd'];  ?>");
                     location.href = 'index.php?view=all';
                 </script>
             <?php
@@ -243,7 +245,7 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
             {
                 ?>
                     <script>
-                        alert("Votre compte a été inactivé. Veuillez contacter les admins!");
+                        alert("<?php echo $messages['accountinactivated'];  ?>");
                         location.href = 'index.php?view=all';
                     </script>
                 <?php
