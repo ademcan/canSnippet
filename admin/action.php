@@ -345,6 +345,9 @@ if (($_GET["action"] == "edit")) {
         <option ';
         if ($row['language'] == 'Java')
             echo 'selected'; echo' value="Java">Java</option>
+        <option ';
+        if ($row['language'] == 'objectivec')
+            echo 'selected'; echo' value="objectivec">Objective-C</option>
         <option';
         if ($row['language'] == 'MATLAB')
             echo 'selected'; echo' value="MATLAB">MATLAB</option>
@@ -410,7 +413,7 @@ if (($_GET["action"] == "edit")) {
 
         $(function() {
             $('#form').on('submit', function() {
-                allowed_languages  = ['C','C++','CSS','HTML','Java','JavaScript','PHP','Python','Ruby','SQL','R','Bash','Perl','Rust','Text','MATLAB'];
+                allowed_languages  = ['C','C++','CSS','HTML','Java','JavaScript','PHP','Python','Ruby','SQL','R','Bash','Perl','Rust','Text','MATLAB','objectivec'];
                 if( !$('#name').val() ) {
                     alert('",$messages['providetitle'],"');
                     return false;
@@ -597,6 +600,7 @@ if (($_GET["action"] == "add")) {
                             <option value="Java">Java</option>
                             <option value="JavaScript">JavaScript</option>
                             <option value="MATLAB">MATLAB</option>
+                            <option value="objectivec">Objective-C</option>
                             <option value="Perl">Perl</option>
                             <option value="PHP">PHP</option>
                             <option value="Python">Python</option>
@@ -656,7 +660,7 @@ if (($_GET["action"] == "add")) {
         $(function() {
 
             $('#form').on('submit', function() {
-                allowed_languages  = ['C','C++','CSS','HTML','Java','JavaScript','PHP','Python','Ruby','SQL','R','Bash','Perl','Rust','Text','MATLAB'];
+                allowed_languages  = ['C','C++','CSS','HTML','Java','JavaScript','PHP','Python','Ruby','SQL','R','Bash','Perl','Rust','Text','MATLAB','objectivec'];
 
                 if( !$("#name").val() | $("#name").val().trim().length == 0 ) {
                     alert("<?php echo($messages['providetitle']); ?>")
