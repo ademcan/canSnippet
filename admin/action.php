@@ -526,7 +526,8 @@ if (isset($_POST["add"])) {
     $highlight = $_POST['highlight'];
     // $date = date("F j, Y - H:i");
     $date = date("Y-m-d");
-    $date = date("Y-m-d-h-i-s");
+    //$date = date("Y-m-d-h-i-s");
+    $dateDb = date("Y-m-d h:i:s");
     // connect to the database
     $mytable = "snippets";
     $base = new SQLite3("../".$config['dbname']);
