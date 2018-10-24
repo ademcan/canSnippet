@@ -18,6 +18,11 @@ For more details check [canSnippet.org](http://cansnippet.org/).
 5. Remove the install.php file for better security
 6. You are done ! Now you canSnippet...
 
+### With Dockerfile
+
+https://github.com/paulbach83 put together a Dockerfile to run canSnippet using Docker, you can find more information in the following repo: 
+https://github.com/paulbach83/Dockerfile-canSnippet
+
 ## Screenshots
 ![Home page](https://ademcan.net/gallery/photos/canSnippet/canSnippetCE2_main.png)
 ![Admin interface](https://ademcan.net/gallery/photos/canSnippet/canSnippetCE2_admin.png)
